@@ -15,7 +15,7 @@ Yet Another C "Unit" Test framework
 - Detailed and short result display
 - Batch mode support (parametric output + error code)
 - Unicode aware
-- Free (BSD-license, see file LICENSE.TXT for details)
+- Free (BSD-license, see file LICENSE for details)
 
 
 To declare a test:
