@@ -85,10 +85,12 @@ struct yct_context {
 }
 
 /* Enable/Disable */
-#define YCT_ENABLE() VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, \
-                                        VNUT_YCT_FLAGS_DISABLED)
-#define YCT_DISABLE() VNUT_YCT_SET_BIT(p_yct_ctx_->flags, \
-                                       VNUT_YCT_FLAGS_DISABLED)
+#define YCT_ENABLE() \
+    VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED)
+
+#define YCT_DISABLE() \
+    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED)
+
 #define YCT_IS_ENABLED() \
     (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED) == 0)
 
