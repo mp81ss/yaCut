@@ -442,10 +442,10 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                             \
     }
 
-        /*VNUT_YCT_LOG(expected == actual);                       \*/
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     VNUT_YCT_IF_OK {                                            \
         p_yct_ctx_->checks++;                                   \
+        VNUT_YCT_LOG(expected == actual);                       \
         if (!((expected) == (actual))) {                        \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \

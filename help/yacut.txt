@@ -205,7 +205,8 @@ blocking mode was set). Otherwise returns 0.
 SECTION: Log
 The logging facility of yacut is quite simple, but is very useful for example
 when the test app crashes and you don't know where. Enabling log just means that
-BEFORE a test is performed, its file, line and test code are printed.
+BEFORE a test/assertions is performed, its file, line and test code are printed
+with a "LOG" prefix.
 See code example ex_???.c
 
 YCT_LOG_ENABLE();
