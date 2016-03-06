@@ -1,4 +1,4 @@
-yaCut v1.0
+yaCut v1.1
 
 Yet Another C "Unit" Test framework
 

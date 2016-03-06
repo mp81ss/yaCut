@@ -1,6 +1,6 @@
 /*
- *  yaCut v1.0 - Yet Another C Unit Test
- *  Copyright (c) 2015 - Michele Pes
+ *  yaCut v1.1 - Yet Another C Unit Test
+ *  Copyright (c) 2016 - Michele Pes
  *
  *  Distributed under the BSD License
  *  See accompanying file LICENSE.txt or copy at
@@ -31,10 +31,11 @@
 #define VNUT_YCT_FLAGS_LOCKED             4
 #define VNUT_YCT_FLAGS_DISABLED           8
 #define VNUT_YCT_FLAGS_IS_SUITE           16
+#define VNUT_YCT_FLAGS_LOG_ENABLED        32
 
 #define YCT_GET_NAME()      "yaCut"
 #define YCT_VERSION_MAJOR() 1
-#define YCT_VERSION_MINOR() 0
+#define YCT_VERSION_MINOR() 1
 
 struct yct_context {
     const char* msg;
@@ -108,8 +109,8 @@ struct yct_context {
     VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_BLOCKING_MODE | \
                                       VNUT_YCT_FLAGS_FULL_BLOCKING_MODE); }
 
-#define YCT_IS_LOCKED() VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
-                                         VNUT_YCT_FLAGS_LOCKED)
+#define YCT_IS_LOCKED() \
+    VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED)
 
 #define VNUT_YCT_IF_OK if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
     VNUT_YCT_FLAGS_DISABLED | VNUT_YCT_FLAGS_LOCKED) == 0)
@@ -117,6 +118,13 @@ struct yct_context {
 #define VNUT_YCT_IF_SET_BLOCKED() if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,   \
     VNUT_YCT_FLAGS_BLOCKING_MODE | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0) \
     { VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED); }
+
+/* Log */
+#define YCT_LOG_ENABLE()
+    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
+
+#define YCT_LOG_DISABLE()
+    VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
 
 /* General */
 #define YCT_BEGIN(name) {                                             \

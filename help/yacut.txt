@@ -1,4 +1,4 @@
-                                YACUT v1.0 manual
+                                YACUT v1.1 manual
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
