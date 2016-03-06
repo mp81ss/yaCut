@@ -178,7 +178,7 @@ With YCT_SET_BLOCKED you can stop execution when an assertion fails.
 With YCT_SET_FULL_BLOCKED execution stops when a warning is issued too.
 The locking mode is isolated to current context (YCT_BEGIN/YCT_END block).
 If you have multiple YCT_BEGIN/YCT_END blocks and one get locked, you have
-to stop others manually. (if !yct_is_locked() ...).
+to stop others manually. (if !YCT_IS_LOCKED() ...).
 See code example ex_block.c
 
 YCT_SET_BLOCKED();
@@ -202,8 +202,28 @@ blocking mode was set). Otherwise returns 0.
 -----------------------------------------------------------------------------
 
 
-SECTION: Assertions
+SECTION: Log
+The logging facility of yacut is quite simple, but is very useful for example
+when the test app crashes and you don't know where. Enabling log just means that
+BEFORE a test is performed, its file, line and test code are printed.
+See code example ex_???.c
 
+YCT_LOG_ENABLE();
+Enable logging. Next assertions will print their positions and tested code
+BEFORE the test if evaluated.
+
+YCT_LOG_DISABLE();
+Disable logging, No logging info is printed. This is the default.
+
+YCT_IS_LOG_ENABLED();
+Returns NON-ZERO if the current context has logging enabled.
+Otherwise returns 0.
+
+
+-----------------------------------------------------------------------------
+
+
+SECTION: Assertions
 Assertions are the basic entities to test software. In this section are listed
 all assertions you can use. Except YCT_MESSAGE and YCT_FAIL that already have
 it, all assertions have a second version that additionally write a custom

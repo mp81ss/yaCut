@@ -62,7 +62,7 @@ struct yct_context {
 #define VNUT_YCT_GET_BIT(var, mask) ((var) & (mask))
 #define VNUT_YCT_CLEAR_BIT(var, mask) ((var) &= ~(mask))
 #define VNUT_YCT_SET_BIT(var, mask) { VNUT_YCT_CLEAR_BIT((var), (mask)); \
-    ((var) |= (mask)); }
+    (var) |= (mask); }
 #define VNUT_YCT_COPY_BIT(src, dest, mask) \
     VNUT_YCT_SET_BIT((dest), VNUT_YCT_GET_BIT((src), (mask)));
 
@@ -120,11 +120,14 @@ struct yct_context {
     { VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED); }
 
 /* Log */
-#define YCT_LOG_ENABLE()
+#define YCT_LOG_ENABLE() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
 
-#define YCT_LOG_DISABLE()
+#define YCT_LOG_DISABLE() \
     VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
+
+#define YCT_IS_LOG_ENABLED() \
+    VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
 
 /* General */
 #define YCT_BEGIN(name) {                                             \
@@ -159,24 +162,25 @@ struct yct_context {
     test_name##_YCT_DISABLED_SUITE_(struct yct_context* const p_yct_ctx_) { \
         void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
 
-#define YCT_TEST_RUN(test_name)                                   \
-    VNUT_YCT_IF_OK {                                              \
-        struct yct_context yct_ctx_;                              \
-        VNUT_YCT_INIT_DATA(yct_ctx_);                             \
-        yct_ctx_.out = p_yct_ctx_->out;                           \
-        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,      \
-            VNUT_YCT_FLAGS_BLOCKING_MODE                          \
-            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE);                 \
-        test_name(&yct_ctx_);                                     \
-        p_yct_ctx_->tests++;                                      \
-        p_yct_ctx_->warnings += yct_ctx_.warnings;                \
-        p_yct_ctx_->checks += yct_ctx_.checks;                    \
-        p_yct_ctx_->messages += yct_ctx_.messages;                \
-        if (yct_ctx_.failed > 0) {                                \
-            VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,  \
-                                          VNUT_YCT_FLAGS_LOCKED); \
-            p_yct_ctx_->failed = 1;                               \
-        }                                                         \
+#define YCT_TEST_RUN(test_name)                                  \
+    VNUT_YCT_IF_OK {                                             \
+        struct yct_context yct_ctx_;                             \
+        VNUT_YCT_INIT_DATA(yct_ctx_);                            \
+        yct_ctx_.out = p_yct_ctx_->out;                          \
+        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
+            VNUT_YCT_FLAGS_BLOCKING_MODE                         \
+            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
+            | VNUT_YCT_FLAGS_LOG_ENABLED);                       \
+        test_name(&yct_ctx_);                                    \
+        p_yct_ctx_->tests++;                                     \
+        p_yct_ctx_->warnings += yct_ctx_.warnings;               \
+        p_yct_ctx_->checks += yct_ctx_.checks;                   \
+        p_yct_ctx_->messages += yct_ctx_.messages;               \
+        if (yct_ctx_.failed > 0) {                               \
+            VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
+                                         VNUT_YCT_FLAGS_LOCKED); \
+            p_yct_ctx_->failed = 1;                              \
+        }                                                        \
     }
 
 #define NO_YCT_TEST_RUN(test_name) (void)(test_name);
@@ -188,7 +192,8 @@ struct yct_context {
         yct_ctx_.out = p_yct_ctx_->out;                          \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
             VNUT_YCT_FLAGS_BLOCKING_MODE                         \
-            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE);                \
+            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
+            | VNUT_YCT_FLAGS_LOG_ENABLED);                       \
         if (f_setup_ != NULL)                                    \
             (*f_setup_)();                                       \
         yct_name(&yct_ctx_);                                     \
@@ -216,7 +221,8 @@ struct yct_context {
         yct_ctx_.out = p_yct_ctx_->out;                      \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags, \
             VNUT_YCT_FLAGS_BLOCKING_MODE                     \
-            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE);            \
+            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE              \
+            | VNUT_YCT_FLAGS_LOG_ENABLED);                   \
         yct_name(&yct_ctx_);                                 \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
                       VNUT_YCT_FLAGS_LOCKED);                \
@@ -343,9 +349,17 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                             \
 }
 
+#define VNUT_YCT_LOG(cond)                                                 \
+    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)) { \
+        VNUT_YCT_PRINT("LOG", #cond);                                      \
+        if (p_yct_ctx_->out != NULL)                                       \
+            VNUT_YCT_FPUTC('\n');                                          \
+    }
+
 /* Messages, Warnings, Assertions */
 #define YCT_MESSAGE(msg) {          \
     p_yct_ctx_->messages++;         \
+    VNUT_YCT_LOG(msg);              \
     VNUT_YCT_PRINT_MAIN("MESSAGE"); \
     if (p_yct_ctx_->out != NULL) {  \
         VNUT_YCT_FPUTS("{ \"");     \
@@ -361,6 +375,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_WARNING(cond)                                                   \
     VNUT_YCT_IF_OK {                                                        \
         p_yct_ctx_->checks++;                                               \
+        VNUT_YCT_LOG(cond);                                                 \
         if (!(cond)) {                                                      \
             p_yct_ctx_->warnings++;                                         \
             VNUT_YCT_PRINT("WARNING", #cond);                               \
@@ -381,6 +396,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
         p_yct_ctx_->checks++;                                               \
         if (!(cond)) {                                                      \
             p_yct_ctx_->warnings++;                                         \
+            VNUT_YCT_LOG(cond);                                             \
             VNUT_YCT_PRINT_MSG("WARNING", #cond, msg);                      \
             if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,                         \
                                  VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0)   \
@@ -403,6 +419,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT(cond)                     \
     VNUT_YCT_IF_OK {                         \
         p_yct_ctx_->checks++;                \
+        VNUT_YCT_LOG(cond);                  \
         if (!(cond)) {                       \
             VNUT_YCT_PRINT("FAILED", #cond); \
             p_yct_ctx_->failed = 1;          \
@@ -416,14 +433,16 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_MSG(cond, msg)                     \
     VNUT_YCT_IF_OK {                                  \
         p_yct_ctx_->checks++;                         \
+        VNUT_YCT_LOG(cond);                           \
         if (!(cond)) {                                \
             VNUT_YCT_PRINT_MSG("FAILED", #cond, msg); \
-            p_yct_ctx_->failed =1;                    \
+            p_yct_ctx_->failed = 1;                   \
             VNUT_YCT_IF_SET_BLOCKED();                \
             VNUT_YCT_RETURN();                        \
         }                                             \
     }
 
+        /*VNUT_YCT_LOG(expected == actual);                       \*/
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     VNUT_YCT_IF_OK {                                            \
         p_yct_ctx_->checks++;                                   \
@@ -434,8 +453,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_PRINT_VAR(expected);                   \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
                 VNUT_YCT_PRINT_VAR(actual);                     \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTC('\n');                           \
+                VNUT_YCT_FPUTS(">\n");                          \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
             VNUT_YCT_IF_SET_BLOCKED();                          \
@@ -446,6 +464,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_EQUAL_MSG(expected, actual, msg)             \
     VNUT_YCT_IF_OK {                                            \
         p_yct_ctx_->checks++;                                   \
+        VNUT_YCT_LOG(expected == actual);                       \
         if (!((expected) == (actual))) {                        \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \
@@ -453,8 +472,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_PRINT_VAR(expected);                   \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
                 VNUT_YCT_PRINT_VAR(actual);                     \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTS(" { \"");                        \
+                VNUT_YCT_FPUTS("> { \"");                       \
                 VNUT_YCT_PRINT_STR(msg);                        \
                 VNUT_YCT_FPUTS("\" }\n");                       \
             }                                                   \
@@ -467,13 +485,13 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_EQUAL(expected, actual)                  \
     VNUT_YCT_IF_OK {                                            \
         p_yct_ctx_->checks++;                                   \
+        VNUT_YCT_LOG(expected != actual);                       \
         if ((expected) == (actual)) {                           \
             VNUT_YCT_PRINT("FAILED", #expected " != " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \
                 VNUT_YCT_FPUTS(": Both values were: <");        \
                 VNUT_YCT_PRINT_VAR(expected);                   \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTC('\n');                           \
+                VNUT_YCT_FPUTS(">\n");                          \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
             VNUT_YCT_IF_SET_BLOCKED();                          \
@@ -484,13 +502,13 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_EQUAL_MSG(expected, actual, msg)         \
     VNUT_YCT_IF_OK {                                            \
         p_yct_ctx_->checks++;                                   \
+        VNUT_YCT_LOG(expected != actual);                       \
         if ((expected) == (actual)) {                           \
             VNUT_YCT_PRINT("FAILED", #expected " != " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \
                 VNUT_YCT_FPUTS(": Both values were: <");        \
                 VNUT_YCT_PRINT_VAR(expected);                   \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTS(" { \"");                        \
+                VNUT_YCT_FPUTS("> { \"");                       \
                 VNUT_YCT_PRINT_STR(msg);                        \
                 VNUT_YCT_FPUTS("\" }\n");                       \
             }                                                   \
