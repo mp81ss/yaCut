@@ -4,7 +4,7 @@ Yet Another C "Unit" Test framework
 
 - Single header, ready to use
 - Very fast (no system call or complex operations)
-- Highly Portable (C99)
+- Highly Portable (C99, 16/32/64bit support, windows/nix/bsd)
 - Follow xUnit architecture
 - Support Messages, Warnings and Assertions
 - Lot of assertions (values, floating point, strings, arrays, objects)
@@ -69,4 +69,4 @@ YCT_SUITE_RUN(test);
 YCT_DUMP_SHORT();
 YCT_END();
 
-For a complete reference of yaCut APIs, please see file yacut.txt
+For a complete reference of yaCut APIs, please see file help.txt

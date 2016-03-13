@@ -394,9 +394,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_WARNING_MSG(cond, msg)                                          \
     VNUT_YCT_IF_OK {                                                        \
         p_yct_ctx_->checks++;                                               \
+        VNUT_YCT_LOG(cond);                                                 \
         if (!(cond)) {                                                      \
             p_yct_ctx_->warnings++;                                         \
-            VNUT_YCT_LOG(cond);                                             \
             VNUT_YCT_PRINT_MSG("WARNING", #cond, msg);                      \
             if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,                         \
                                  VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0)   \
@@ -482,45 +482,46 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                                       \
     }
 
-#define YCT_ASSERT_NOT_EQUAL(expected, actual)                  \
-    VNUT_YCT_IF_OK {                                            \
-        p_yct_ctx_->checks++;                                   \
-        VNUT_YCT_LOG(expected != actual);                       \
-        if ((expected) == (actual)) {                           \
-            VNUT_YCT_PRINT("FAILED", #expected " != " #actual); \
-            if (p_yct_ctx_->out != NULL) {                      \
-                VNUT_YCT_FPUTS(": Both values were: <");        \
-                VNUT_YCT_PRINT_VAR(expected);                   \
-                VNUT_YCT_FPUTS(">\n");                          \
-            }                                                   \
-            p_yct_ctx_->failed = 1;                             \
-            VNUT_YCT_IF_SET_BLOCKED();                          \
-            VNUT_YCT_RETURN();                                  \
-        }                                                       \
+#define YCT_ASSERT_NOT_EQUAL(str1, str2)                  \
+    VNUT_YCT_IF_OK {                                      \
+        p_yct_ctx_->checks++;                             \
+        VNUT_YCT_LOG(str1 != str2);                       \
+        if ((str1) == (str2)) {                           \
+            VNUT_YCT_PRINT("FAILED", #str1 " != " #str2); \
+            if (p_yct_ctx_->out != NULL) {                \
+                VNUT_YCT_FPUTS(": Both values were: <");  \
+                VNUT_YCT_PRINT_VAR(str1);                 \
+                VNUT_YCT_FPUTS(">\n");                    \
+            }                                             \
+            p_yct_ctx_->failed = 1;                       \
+            VNUT_YCT_IF_SET_BLOCKED();                    \
+            VNUT_YCT_RETURN();                            \
+        }                                                 \
     }
 
-#define YCT_ASSERT_NOT_EQUAL_MSG(expected, actual, msg)         \
-    VNUT_YCT_IF_OK {                                            \
-        p_yct_ctx_->checks++;                                   \
-        VNUT_YCT_LOG(expected != actual);                       \
-        if ((expected) == (actual)) {                           \
-            VNUT_YCT_PRINT("FAILED", #expected " != " #actual); \
-            if (p_yct_ctx_->out != NULL) {                      \
-                VNUT_YCT_FPUTS(": Both values were: <");        \
-                VNUT_YCT_PRINT_VAR(expected);                   \
-                VNUT_YCT_FPUTS("> { \"");                       \
-                VNUT_YCT_PRINT_STR(msg);                        \
-                VNUT_YCT_FPUTS("\" }\n");                       \
-            }                                                   \
-            p_yct_ctx_->failed = 1;                             \
-            VNUT_YCT_IF_SET_BLOCKED();                          \
-            VNUT_YCT_RETURN();                                  \
-        }                                                       \
+#define YCT_ASSERT_NOT_EQUAL_MSG(str1, str2, msg)         \
+    VNUT_YCT_IF_OK {                                      \
+        p_yct_ctx_->checks++;                             \
+        VNUT_YCT_LOG(str1 != str2);                       \
+        if ((str1) == (str2)) {                           \
+            VNUT_YCT_PRINT("FAILED", #str1 " != " #str2); \
+            if (p_yct_ctx_->out != NULL) {                \
+                VNUT_YCT_FPUTS(": Both values were: <");  \
+                VNUT_YCT_PRINT_VAR(str1);                 \
+                VNUT_YCT_FPUTS("> { \"");                 \
+                VNUT_YCT_PRINT_STR(msg);                  \
+                VNUT_YCT_FPUTS("\" }\n");                 \
+            }                                             \
+            p_yct_ctx_->failed = 1;                       \
+            VNUT_YCT_IF_SET_BLOCKED();                    \
+            VNUT_YCT_RETURN();                            \
+        }                                                 \
     }
 
 #define YCT_ASSERT_NULL(var)                   \
     VNUT_YCT_IF_OK {                           \
         p_yct_ctx_->checks++;                  \
+        VNUT_YCT_LOG(var == NULL);             \
         if ((var) != NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
@@ -537,6 +538,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NULL_MSG(var, msg)             \
     VNUT_YCT_IF_OK {                              \
         p_yct_ctx_->checks++;                     \
+        VNUT_YCT_LOG(var == NULL);                \
         if ((var) != NULL) {                      \
             VNUT_YCT_PRINT_MAIN("FAILED");        \
             if (p_yct_ctx_->out != NULL) {        \
@@ -555,6 +557,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_NULL(var)               \
     VNUT_YCT_IF_OK {                           \
         p_yct_ctx_->checks++;                  \
+        VNUT_YCT_LOG(var != NULL);             \
         if ((var) == NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
@@ -571,6 +574,8 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_NULL_MSG(var, msg)   \
     VNUT_YCT_IF_OK {                        \
         p_yct_ctx_->checks++;               \
+        VNUT_YCT_LOG(var != NULL);          \
+        VNUT_YCT_LOG(var);                  \
         if ((var) == NULL) {                \
             VNUT_YCT_PRINT_MAIN("FAILED");  \
             if (p_yct_ctx_->out != NULL) {  \
@@ -599,6 +604,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                                            \
         int yct_out_;                                           \
         p_yct_ctx_->checks++;                                   \
+        VNUT_YCT_LOG(expected == actual);                       \
         VNUT_YCT_COMPARE_STR((expected), (actual), yct_out_);   \
         if (yct_out_ != 0) {                                    \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
@@ -619,6 +625,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                                           \
         int yct_out_;                                          \
         p_yct_ctx_->checks++;                                  \
+        VNUT_YCT_LOG(expected == actual);                      \
         VNUT_YCT_COMPARE_STR((expected), (actual), yct_out_);  \
         if (yct_out_ != 0) {                                   \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual) \
@@ -641,6 +648,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                                       \
         int yct_out_;                                      \
         p_yct_ctx_->checks++;                              \
+        VNUT_YCT_LOG(str1 != str2);                        \
         VNUT_YCT_COMPARE_STR((str1), (str2), yct_out_);    \
         if (yct_out_ == 0) {                               \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2)   \
@@ -659,6 +667,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                                       \
         int yct_out_;                                      \
         p_yct_ctx_->checks++;                              \
+        VNUT_YCT_LOG(str1 != str2);                        \
         VNUT_YCT_COMPARE_STR((str1), (str2), yct_out_);    \
         if (yct_out_ == 0) {                               \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2);  \
@@ -676,65 +685,69 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }
 
 #define VNUT_YCT_COMPARE_ARRAY(arr1, arr2, len, out) \
-    for (out = 0; out < (unsigned int)len && arr1[out] == arr2[out]; out++) ;
+    for (out = 0; out < (unsigned int)(len) && arr1[out] == arr2[out]; out++) ;
 
-#define YCT_ASSERT_EQUAL_ARRAY(arr1, arr2, len)                              \
-    VNUT_YCT_IF_OK {                                                         \
-        unsigned int yct_out_;                                               \
-        p_yct_ctx_->checks++;                                                \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);               \
-        if (yct_out_ < (unsigned int)len) {                                  \
-            VNUT_YCT_PRINT("FAILED", #arr1 " == " #arr2);                    \
-            if (p_yct_ctx_->out != NULL) {                                   \
-                (void)fprintf(p_yct_ctx_->out,                               \
-                              ": 'Element [%u] was different'\n", yct_out_); \
-            }                                                                \
-            p_yct_ctx_->failed = 1;                                          \
-            VNUT_YCT_IF_SET_BLOCKED();                                       \
-            VNUT_YCT_RETURN();                                               \
-        }                                                                    \
+#define YCT_ASSERT_EQUAL_ARRAY(expected, actual, len)                  \
+    VNUT_YCT_IF_OK {                                                   \
+        unsigned int yct_out_;                                         \
+        p_yct_ctx_->checks++;                                          \
+        VNUT_YCT_LOG(expected == actual);                              \
+        VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), yct_out_); \
+        if (yct_out_ < (unsigned int)(len)) {                          \
+            VNUT_YCT_PRINT("FAILED", #expected " == " #actual);        \
+            if (p_yct_ctx_->out != NULL) {                             \
+                (void)fprintf(p_yct_ctx_->out,                         \
+                      ": 'Element [%u] was different'\n", yct_out_);   \
+            }                                                          \
+            p_yct_ctx_->failed = 1;                                    \
+            VNUT_YCT_IF_SET_BLOCKED();                                 \
+            VNUT_YCT_RETURN();                                         \
+        }                                                              \
     }
 
-#define YCT_ASSERT_EQUAL_ARRAY_MSG(arr1, arr2, len, msg)                     \
-    VNUT_YCT_IF_OK {                                                         \
-        unsigned int yct_out_;                                               \
-        p_yct_ctx_->checks++;                                                \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);               \
-        if (yct_out_ < (unsigned int)len) {                                  \
-            VNUT_YCT_PRINT("FAILED", #arr1 " == " #arr2);                    \
-            if (p_yct_ctx_->out != NULL) {                                   \
-                (void)fprintf(p_yct_ctx_->out,                               \
-                           ": 'Element [%u] was different' { \"", yct_out_); \
-                VNUT_YCT_PRINT_STR(msg);                                     \
-                VNUT_YCT_FPUTS("\" }\n");                                    \
-            }                                                                \
-            p_yct_ctx_->failed = 1;                                          \
-            VNUT_YCT_IF_SET_BLOCKED();                                       \
-            VNUT_YCT_RETURN();                                               \
-        }                                                                    \
+#define YCT_ASSERT_EQUAL_ARRAY_MSG(expected, actual, len, msg)          \
+    VNUT_YCT_IF_OK {                                                    \
+        unsigned int yct_out_;                                          \
+        p_yct_ctx_->checks++;                                           \
+        VNUT_YCT_LOG(expected == actual);                               \
+        VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), yct_out_);  \
+        if (yct_out_ < (unsigned int)(len)) {                           \
+            VNUT_YCT_PRINT("FAILED", #expected " == " #actual);         \
+            if (p_yct_ctx_->out != NULL) {                              \
+                (void)fprintf(p_yct_ctx_->out,                          \
+                      ": 'Element [%u] was different' { \"", yct_out_); \
+                VNUT_YCT_PRINT_STR(msg);                                \
+                VNUT_YCT_FPUTS("\" }\n");                               \
+            }                                                           \
+            p_yct_ctx_->failed = 1;                                     \
+            VNUT_YCT_IF_SET_BLOCKED();                                  \
+            VNUT_YCT_RETURN();                                          \
+        }                                                               \
     }
 
-#define YCT_ASSERT_NOT_EQUAL_ARRAY(arr1, arr2, len)            \
-    VNUT_YCT_IF_OK {                                           \
-        unsigned int yct_out_;                                 \
-        p_yct_ctx_->checks++;                                  \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_); \
-        if (yct_out_ == (unsigned int)len) {                   \
-            VNUT_YCT_PRINT("FAILED", #arr1 " != " #arr2);      \
-            if (p_yct_ctx_->out != NULL)                       \
-                VNUT_YCT_FPUTC('\n');                          \
-            p_yct_ctx_->failed = 1;                            \
-            VNUT_YCT_IF_SET_BLOCKED();                         \
-            VNUT_YCT_RETURN();                                 \
-        }                                                      \
+#define YCT_ASSERT_NOT_EQUAL_ARRAY(arr1, arr2, len)              \
+    VNUT_YCT_IF_OK {                                             \
+        unsigned int yct_out_;                                   \
+        p_yct_ctx_->checks++;                                    \
+        VNUT_YCT_LOG(arr1 != arr2);                              \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_); \
+        if (yct_out_ == (unsigned int)(len)) {                   \
+            VNUT_YCT_PRINT("FAILED", #arr1 " != " #arr2);        \
+            if (p_yct_ctx_->out != NULL)                         \
+                VNUT_YCT_FPUTC('\n');                            \
+            p_yct_ctx_->failed = 1;                              \
+            VNUT_YCT_IF_SET_BLOCKED();                           \
+            VNUT_YCT_RETURN();                                   \
+        }                                                        \
     }
 
 #define YCT_ASSERT_NOT_EQUAL_ARRAY_MSG(arr1, arr2, len, msg)       \
     VNUT_YCT_IF_OK {                                               \
         unsigned int yct_out_;                                     \
         p_yct_ctx_->checks++;                                      \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);     \
-        if (yct_out_ == (unsigned int)len) {                       \
+        VNUT_YCT_LOG(arr1 != arr2);                                \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_);   \
+        if (yct_out_ == (unsigned int)(len)) {                     \
             VNUT_YCT_PRINT_MSG("FAILED", #arr1 " != " #arr2, msg); \
             p_yct_ctx_->failed = 1;                                \
             VNUT_YCT_IF_SET_BLOCKED();                             \
@@ -742,85 +755,90 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                                          \
     }
 
-#define YCT_ASSERT_EQUAL_OBJ(o1, o2, fcmp) \
-    VNUT_YCT_IF_OK {                       \
-        p_yct_ctx_->checks++;              \
-        if (fcmp(&o1, &o2) != 0) {         \
-            VNUT_YCT_PRINT_MAIN("FAILED"); \
-            if (p_yct_ctx_->out != NULL) { \
-                VNUT_YCT_FPUTC('(');       \
-                VNUT_YCT_PRINT_STR(#o1);   \
-                VNUT_YCT_FPUTS(" == ");    \
-                VNUT_YCT_PRINT_STR(#o2);   \
-                VNUT_YCT_FPUTS(")\n");     \
-            }                              \
-            p_yct_ctx_->failed = 1;        \
-            VNUT_YCT_IF_SET_BLOCKED();     \
-            VNUT_YCT_RETURN();             \
-        }                                  \
+#define YCT_ASSERT_EQUAL_OBJ(expected, actual, fcmp) \
+    VNUT_YCT_IF_OK {                                 \
+        p_yct_ctx_->checks++;                        \
+        VNUT_YCT_LOG(expected == actual);            \
+        if (fcmp(&expected, &actual) != 0) {         \
+            VNUT_YCT_PRINT_MAIN("FAILED");           \
+            if (p_yct_ctx_->out != NULL) {           \
+                VNUT_YCT_FPUTC('(');                 \
+                VNUT_YCT_PRINT_STR(#expected);       \
+                VNUT_YCT_FPUTS(" == ");              \
+                VNUT_YCT_PRINT_STR(#actual);         \
+                VNUT_YCT_FPUTS(")\n");               \
+            }                                        \
+            p_yct_ctx_->failed = 1;                  \
+            VNUT_YCT_IF_SET_BLOCKED();               \
+            VNUT_YCT_RETURN();                       \
+        }                                            \
     }
 
-#define YCT_ASSERT_EQUAL_OBJ_MSG(o1, o2, fcmp, msg) \
-    VNUT_YCT_IF_OK {                                \
-        p_yct_ctx_->checks++;                       \
-        if (fcmp(&o1, &o2) != 0) {                  \
-            VNUT_YCT_PRINT_MAIN("FAILED");          \
-            if (p_yct_ctx_->out != NULL) {          \
-                VNUT_YCT_FPUTC('(');                \
-                VNUT_YCT_PRINT_STR(#o1);            \
-                VNUT_YCT_FPUTS(" == ");             \
-                VNUT_YCT_PRINT_STR(#o2);            \
-                VNUT_YCT_FPUTS(") { \"");           \
-                VNUT_YCT_PRINT_STR(msg);            \
-                VNUT_YCT_FPUTS("\" }\n");           \
-            }                                       \
-            p_yct_ctx_->failed = 1;                 \
-            VNUT_YCT_IF_SET_BLOCKED();              \
-            VNUT_YCT_RETURN();                      \
-        }                                           \
+#define YCT_ASSERT_EQUAL_OBJ_MSG(expected, actual, fcmp, msg) \
+    VNUT_YCT_IF_OK {                                          \
+        p_yct_ctx_->checks++;                                 \
+        VNUT_YCT_LOG(expected == actual);                     \
+        if (fcmp(&expected, &actual) != 0) {                  \
+            VNUT_YCT_PRINT_MAIN("FAILED");                    \
+            if (p_yct_ctx_->out != NULL) {                    \
+                VNUT_YCT_FPUTC('(');                          \
+                VNUT_YCT_PRINT_STR(#expected);                \
+                VNUT_YCT_FPUTS(" == ");                       \
+                VNUT_YCT_PRINT_STR(#actual);                  \
+                VNUT_YCT_FPUTS(") { \"");                     \
+                VNUT_YCT_PRINT_STR(msg);                      \
+                VNUT_YCT_FPUTS("\" }\n");                     \
+            }                                                 \
+            p_yct_ctx_->failed = 1;                           \
+            VNUT_YCT_IF_SET_BLOCKED();                        \
+            VNUT_YCT_RETURN();                                \
+        }                                                     \
     }
 
-#define YCT_ASSERT_NOT_EQUAL_OBJ(o1, o2, fcmp) \
-    VNUT_YCT_IF_OK {                           \
-        p_yct_ctx_->checks++;                  \
-        if (fcmp(&o1, &o2) == 0) {             \
-            VNUT_YCT_PRINT_MAIN("FAILED");     \
-            if (p_yct_ctx_->out != NULL) {     \
-                VNUT_YCT_FPUTC('(');           \
-                VNUT_YCT_PRINT_STR(#o1);       \
-                VNUT_YCT_FPUTS(" != ");        \
-                VNUT_YCT_PRINT_STR(#o2);       \
-                VNUT_YCT_FPUTS(")\n");         \
-            }                                  \
-            p_yct_ctx_->failed = 1;            \
-            VNUT_YCT_IF_SET_BLOCKED();         \
-            VNUT_YCT_RETURN();                 \
-        }                                      \
+#define YCT_ASSERT_NOT_EQUAL_OBJ(obj1, obj2, fcmp) \
+    VNUT_YCT_IF_OK {                               \
+        p_yct_ctx_->checks++;                      \
+        VNUT_YCT_LOG(obj1 != obj2);                \
+        if (fcmp(&obj1, &obj2) == 0) {             \
+            VNUT_YCT_PRINT_MAIN("FAILED");         \
+            if (p_yct_ctx_->out != NULL) {         \
+                VNUT_YCT_FPUTC('(');               \
+                VNUT_YCT_PRINT_STR(#obj1);         \
+                VNUT_YCT_FPUTS(" != ");            \
+                VNUT_YCT_PRINT_STR(#obj2);         \
+                VNUT_YCT_FPUTS(")\n");             \
+            }                                      \
+            p_yct_ctx_->failed = 1;                \
+            VNUT_YCT_IF_SET_BLOCKED();             \
+            VNUT_YCT_RETURN();                     \
+        }                                          \
     }
 
-#define YCT_ASSERT_NOT_EQUAL_OBJ_MSG(o1, o2, fcmp, msg) \
-    VNUT_YCT_IF_OK {                                    \
-        p_yct_ctx_->checks++;                           \
-        if (fcmp(&o1, &o2) == 0) {                      \
-            VNUT_YCT_PRINT_MAIN("FAILED");              \
-            if (p_yct_ctx_->out != NULL) {              \
-                VNUT_YCT_FPUTC('(');                    \
-                VNUT_YCT_PRINT_STR(#o1);                \
-                VNUT_YCT_FPUTS(" != ");                 \
-                VNUT_YCT_PRINT_STR(#o2);                \
-                VNUT_YCT_FPUTS(") { \"");               \
-                VNUT_YCT_PRINT_STR(msg);                \
-                VNUT_YCT_FPUTS("\" }\n");               \
-            }                                           \
-            p_yct_ctx_->failed = 1;                     \
-            VNUT_YCT_IF_SET_BLOCKED();                  \
-            VNUT_YCT_RETURN();                          \
-        }                                               \
+#define YCT_ASSERT_NOT_EQUAL_OBJ_MSG(obj1, obj2, fcmp, msg) \
+    VNUT_YCT_IF_OK {                                        \
+        p_yct_ctx_->checks++;                               \
+        VNUT_YCT_LOG(obj1 != obj2);                         \
+        if (fcmp(&obj1, &obj2) == 0) {                      \
+            VNUT_YCT_PRINT_MAIN("FAILED");                  \
+            if (p_yct_ctx_->out != NULL) {                  \
+                VNUT_YCT_FPUTC('(');                        \
+                VNUT_YCT_PRINT_STR(#obj1);                  \
+                VNUT_YCT_FPUTS(" != ");                     \
+                VNUT_YCT_PRINT_STR(#obj2);                  \
+                VNUT_YCT_FPUTS(") { \"");                   \
+                VNUT_YCT_PRINT_STR(msg);                    \
+                VNUT_YCT_FPUTS("\" }\n");                   \
+            }                                               \
+            p_yct_ctx_->failed = 1;                         \
+            VNUT_YCT_IF_SET_BLOCKED();                      \
+            VNUT_YCT_RETURN();                              \
+        }                                                   \
     }
 
 #define YCT_ASSERT_EQUAL_FLOAT(a, b, t)             \
     VNUT_YCT_IF_OK {                                \
         p_yct_ctx_->checks++;                       \
+        VNUT_YCT_LOG(a == b);                       \
         if (VNUT_YCT_ABS((a) - (b)) > t) {          \
             VNUT_YCT_PRINT("FAILED", #a " == " #b); \
             if (p_yct_ctx_->out != NULL)            \
@@ -834,6 +852,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_EQUAL_FLOAT_MSG(a, b, t, msg)             \
     VNUT_YCT_IF_OK {                                         \
         p_yct_ctx_->checks++;                                \
+        VNUT_YCT_LOG(a == b);                                \
         if (VNUT_YCT_ABS((a) - (b)) > t) {                   \
             VNUT_YCT_PRINT_MSG("FAILED", #a " == " #b, msg); \
             p_yct_ctx_->failed = 1;                          \
@@ -845,6 +864,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_EQUAL_FLOAT(a, b, t)         \
     VNUT_YCT_IF_OK {                                \
         p_yct_ctx_->checks++;                       \
+        VNUT_YCT_LOG(a != b);                       \
         if (VNUT_YCT_ABS((a) - (b)) > t) { } else { \
             VNUT_YCT_PRINT("FAILED", #a " != " #b); \
             if (p_yct_ctx_->out != NULL)            \
@@ -858,6 +878,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define YCT_ASSERT_NOT_EQUAL_FLOAT_MSG(a, b, t, msg)         \
     VNUT_YCT_IF_OK {                                         \
         p_yct_ctx_->checks++;                                \
+        VNUT_YCT_LOG(a != b);                                \
         if (VNUT_YCT_ABS((a) - (b)) > t) { } else {          \
             VNUT_YCT_PRINT_MSG("FAILED", #a " != " #b, msg); \
             p_yct_ctx_->failed = 1;                          \
