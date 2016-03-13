@@ -29,6 +29,10 @@ YCT_DISABLE_INT64
 yaCut can disable the int64 support. This prevents compilation errors on some
 old 16bit compiler for example.
 
+YCT_DISABLE_LOG_SUPPORT
+Defining this macro remove log support. If you don't need log, you can have
+smaller executable.
+
 
 -----------------------------------------------------------------------------
 

@@ -120,6 +120,7 @@ struct yct_context {
     { VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED); }
 
 /* Log */
+#ifndef YCT_DISABLE_LOG_SUPPORT
 #define YCT_LOG_ENABLE() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
 
@@ -128,6 +129,11 @@ struct yct_context {
 
 #define YCT_IS_LOG_ENABLED() \
     VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
+#else
+#define YCT_LOG_ENABLE()
+#define YCT_LOG_DISABLE()
+#define YCT_IS_LOG_ENABLED() 0
+#endif
 
 /* General */
 #define YCT_BEGIN(name) {                                             \
@@ -349,12 +355,16 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                             \
 }
 
+#ifndef YCT_DISABLE_LOG_SUPPORT
 #define VNUT_YCT_LOG(cond)                                                 \
     if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)) { \
         VNUT_YCT_PRINT("LOG", #cond);                                      \
         if (p_yct_ctx_->out != NULL)                                       \
             VNUT_YCT_FPUTC('\n');                                          \
     }
+#else
+#define VNUT_YCT_LOG(cond)
+#endif
 
 /* Messages, Warnings, Assertions */
 #define YCT_MESSAGE(msg) {          \
