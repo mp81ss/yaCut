@@ -1,0 +1,16 @@
+Legend:
+    + Added
+    - Fixed
+    * Changed
+
+
+1.1 ()
+
++ Log support
++ Timing support
+- Minor bugs on array functions
+* Esthetic internal code
+
+1.0 (28 Nov 2015)
+
+    First version
