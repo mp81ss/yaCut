@@ -1,5 +1,5 @@
 /*
- *  yaCut v1.1 - Yet Another C Unit Test
+ *  yaCut v2.0 - Yet Another C Unit Test
  *  Copyright (c) 2016 - Michele Pes
  *
  *  Distributed under the BSD License
@@ -34,8 +34,8 @@
 #define VNUT_YCT_FLAGS_LOG_ENABLED        32
 
 #define YCT_GET_NAME()      "yaCut"
-#define YCT_VERSION_MAJOR() 1
-#define YCT_VERSION_MINOR() 1
+#define YCT_VERSION_MAJOR() 2
+#define YCT_VERSION_MINOR() 0
 
 struct yct_context {
     const char* msg;
@@ -120,7 +120,11 @@ struct yct_context {
     { VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED); }
 
 /* Log */
-#ifndef YCT_DISABLE_LOG_SUPPORT
+#if ((defined YCT_OPT_DISABLE_LOG_SUPPORT) || defined(YCT_DISABLE_LOG_SUPPORT))
+#define YCT_LOG_ENABLE()
+#define YCT_LOG_DISABLE()
+#define YCT_IS_LOG_ENABLED() 0
+#else
 #define YCT_LOG_ENABLE() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
 
@@ -129,10 +133,6 @@ struct yct_context {
 
 #define YCT_IS_LOG_ENABLED() \
     VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
-#else
-#define YCT_LOG_ENABLE()
-#define YCT_LOG_DISABLE()
-#define YCT_IS_LOG_ENABLED() 0
 #endif
 
 /* General */
@@ -294,7 +294,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 }
 
 /* Internal prints */
-#ifdef YCT_DISABLE_INT64
+#if (defined(YCT_DISABLE_INT64) || defined(YCT_OPT_DISABLE_INT64))
 
 #define VNUT_YCT_PRINT_VAR(var) {                                        \
     const size_t yct_pv_len_ = sizeof(var);                              \
@@ -355,15 +355,15 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                             \
 }
 
-#ifndef YCT_DISABLE_LOG_SUPPORT
+#if ((defined YCT_OPT_DISABLE_LOG_SUPPORT) || defined(YCT_DISABLE_LOG_SUPPORT))
+#define VNUT_YCT_LOG(cond)
+#else
 #define VNUT_YCT_LOG(cond)                                                 \
     if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)) { \
         VNUT_YCT_PRINT("LOG", #cond);                                      \
         if (p_yct_ctx_->out != NULL)                                       \
             VNUT_YCT_FPUTC('\n');                                          \
     }
-#else
-#define VNUT_YCT_LOG(cond)
 #endif
 
 /* Messages, Warnings, Assertions */

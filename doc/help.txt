@@ -1,4 +1,4 @@
-                                YACUT v1.1 manual
+                                YACUT v2.0 manual
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
@@ -19,26 +19,28 @@ SECTION: Parameters
 These macros can be defined BEFORE including yacut. They might be able to
 support some compiler errors.
 
-YCT_FUNC_NAME
-yaCut tries to guess it, and usually succeeds. If it fails, you can help it by
-defining it with the value your compiler assigns to the current function name.
-Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
-The worst case is to define it to a constant ("unknown") to allow compilation.
-
-YCT_DISABLE_INT64
+YCT_OPT_DISABLE_INT64
 yaCut can disable the int64 support. This prevents compilation errors on some
 old 16bit compiler for example.
 
-YCT_DISABLE_LOG_SUPPORT
+YCT_OPT_DISABLE_LOG_SUPPORT
 Defining this macro remove log support. If you don't need log, you can have
 smaller executable.
+
+YCT_FUNC_NAME
+This is not a real parameter. This is the macro (if defined so) that the
+compiler offer to retrieve the current function name. It is needed by yaCut, so
+if compilation fails due to this macro, you can redefine it. yaCut tries to
+guess it, and usually succeeds. If it fails, you can help it by
+defining it with the value your compiler assigns to the current function name.
+Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
+The worst case is to define it to a constant ("unknown") to allow compilation.
 
 
 -----------------------------------------------------------------------------
 
 
 SECTION: General
-
 
 YCT_GET_NAME();
 Returns a string literal representing the name of the library.
