@@ -135,9 +135,10 @@ struct yct_context {
 #define YCT_DISABLE_TIMING() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)
 #define VNUT_YCT_GET_START_TIME() yct_main_ctx_.clocks = clock()
-#define VNUT_YCT_PRINT_ELAPSED_TIME()                      \
-    fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double) \
-        (clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC);
+#define VNUT_YCT_PRINT_ELAPSED_TIME()                                       \
+    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING) \
+        == 0) { fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double)      \
+                (clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC); }
 #endif
 
 // Log
@@ -307,9 +308,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     p_yct_ctx_->failed, p_yct_ctx_->suites, p_yct_ctx_->messages,            \
     p_yct_ctx_->warnings, p_yct_ctx_->checks - p_yct_ctx_->warnings,         \
     (float)((tests - p_yct_ctx_->failed) * 100) / (float)tests);             \
-    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)  \
-        == 0) {  VNUT_YCT_PRINT_ELAPSED_TIME(); }                            \
-    if (p_yct_ctx_->failed > 0)                                              \
+    VNUT_YCT_PRINT_ELAPSED_TIME(); if (p_yct_ctx_->failed > 0)               \
         VNUT_YCT_FPUTS("\n------> SOMETHING FAILED <-----\n");               \
     else {                                                                   \
         if (p_yct_ctx_->warnings > 0)                                        \
