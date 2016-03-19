@@ -2,7 +2,7 @@
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
-C99 or newer is recommended, older standards may work.
+C99 or newer is recommended, older standards may not work.
 It is heavily based on preprocessor macros, see examples to get started with
 code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
@@ -23,7 +23,7 @@ YCT_OPT_DISABLE_INT64
 yaCut can disable the int64 support. This prevents compilation errors on some
 old 16bit compiler for example.
 
-YCT_OPT_DISABLE_LOG_SUPPORT
+YCT_OPT_DISABLE_LOG
 Defining this macro remove log support. If you don't need log, you can have
 smaller executable.
 
@@ -68,6 +68,9 @@ Print something like "all ok" or "some warning" or "some failure".
 YCT_DUMP();
 Print a quite detailed summary of execution. Typically used as last directive
 before YCT_END.
+
+YCT_DISABLE_TIMING();
+Using this macro prevents yaCut to write elapsed time.
 
 
 -----------------------------------------------------------------------------
@@ -215,11 +218,11 @@ BEFORE a test/assertions is performed, its file, line and test code are printed
 with a "LOG" prefix.
 See code example ex_???.c
 
-YCT_LOG_ENABLE();
+YCT_ENABLE_LOG();
 Enable logging. Next assertions will print their positions and tested code
 BEFORE the test if evaluated.
 
-YCT_LOG_DISABLE();
+YCT_DISABLE_LOG();
 Disable logging, No logging info is printed. This is the default.
 
 YCT_IS_LOG_ENABLED();

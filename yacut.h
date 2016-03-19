@@ -11,6 +11,9 @@
 #define YACUT_H_
 
 #include <stdio.h>
+#ifndef YCT_OPT_DISABLE_TIMING
+#include <time.h>
+#endif
 
 #ifndef YCT_FUNC_NAME
 #ifdef __GNUC__
@@ -26,12 +29,13 @@
 #endif
 #endif
 
-#define VNUT_YCT_FLAGS_BLOCKING_MODE      1
-#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE 2
-#define VNUT_YCT_FLAGS_LOCKED             4
-#define VNUT_YCT_FLAGS_DISABLED           8
-#define VNUT_YCT_FLAGS_IS_SUITE           16
-#define VNUT_YCT_FLAGS_LOG_ENABLED        32
+#define VNUT_YCT_FLAGS_BLOCKING_MODE        1
+#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE   2
+#define VNUT_YCT_FLAGS_LOCKED               4
+#define VNUT_YCT_FLAGS_DISABLED             8
+#define VNUT_YCT_FLAGS_IS_SUITE             16
+#define VNUT_YCT_FLAGS_LOG                  32
+#define VNUT_YCT_FLAGS_DISABLED_TIMING      64
 
 #define YCT_GET_NAME()      "yaCut"
 #define YCT_VERSION_MAJOR() 2
@@ -40,6 +44,9 @@
 struct yct_context {
     const char* msg;
     FILE* out;
+#ifndef YCT_OPT_DISABLE_TIMING
+    clock_t clocks;
+#endif
     int suites;
     int messages;
     int tests;
@@ -85,7 +92,7 @@ struct yct_context {
     }                                 \
 }
 
-/* Enable/Disable */
+// Enable/Disable
 #define YCT_ENABLE() \
     VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED)
 
@@ -95,7 +102,7 @@ struct yct_context {
 #define YCT_IS_ENABLED() \
     (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED) == 0)
 
-/* Blocking */
+// Blocking
 #define YCT_SET_BLOCKED() {                                \
     VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                  \
                        VNUT_YCT_FLAGS_FULL_BLOCKING_MODE); \
@@ -119,23 +126,41 @@ struct yct_context {
     VNUT_YCT_FLAGS_BLOCKING_MODE | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0) \
     { VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOCKED); }
 
-/* Log */
-#if ((defined YCT_OPT_DISABLE_LOG_SUPPORT) || defined(YCT_DISABLE_LOG_SUPPORT))
-#define YCT_LOG_ENABLE()
-#define YCT_LOG_DISABLE()
-#define YCT_IS_LOG_ENABLED() 0
+// Timing
+#ifdef YCT_OPT_DISABLE_TIMING
+#define YCT_DISABLE_TIMING()
+#define VNUT_YCT_GET_START_TIME()
+#define VNUT_YCT_PRINT_ELAPSED_TIME()
 #else
-#define YCT_LOG_ENABLE() \
-    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
-
-#define YCT_LOG_DISABLE() \
-    VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
-
-#define YCT_IS_LOG_ENABLED() \
-    VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)
+#define YCT_DISABLE_TIMING() \
+    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)
+#define VNUT_YCT_GET_START_TIME() yct_main_ctx_.clocks = clock()
+#define VNUT_YCT_PRINT_ELAPSED_TIME()                      \
+    fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double) \
+        (clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC);
 #endif
 
-/* General */
+// Log
+#ifdef YCT_OPT_DISABLE_LOG
+
+#define YCT_ENABLE_LOG()
+#define YCT_DISABLE_LOG()
+#define YCT_IS_LOG_ENABLED() 0
+
+#else
+
+#define YCT_ENABLE_LOG() \
+    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)
+
+#define YCT_DISABLE_LOG() \
+    VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)
+
+#define YCT_IS_LOG_ENABLED() \
+    VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)
+
+#endif
+
+// General
 #define YCT_BEGIN(name) {                                             \
     struct yct_context yct_main_ctx_;                                 \
     struct yct_context* const p_yct_ctx_ = &yct_main_ctx_;            \
@@ -144,8 +169,7 @@ struct yct_context {
     if ((name) != NULL && *(name) != 0) {                             \
         if (*(name) != '\"') yct_main_ctx_.msg = (const char*)(name); \
         else yct_main_ctx_.msg = #name;                               \
-    }                                                                 \
-    else p_yct_ctx_->msg = "";
+    } else p_yct_ctx_->msg = ""; VNUT_YCT_GET_START_TIME();
 
 #define YCT_TEST(test_name) \
     static void test_name(struct yct_context* const p_yct_ctx_)
@@ -176,7 +200,7 @@ struct yct_context {
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
             VNUT_YCT_FLAGS_BLOCKING_MODE                         \
             | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
-            | VNUT_YCT_FLAGS_LOG_ENABLED);                       \
+            | VNUT_YCT_FLAGS_LOG);                               \
         test_name(&yct_ctx_);                                    \
         p_yct_ctx_->tests++;                                     \
         p_yct_ctx_->warnings += yct_ctx_.warnings;               \
@@ -199,7 +223,7 @@ struct yct_context {
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
             VNUT_YCT_FLAGS_BLOCKING_MODE                         \
             | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
-            | VNUT_YCT_FLAGS_LOG_ENABLED);                       \
+            | VNUT_YCT_FLAGS_LOG);                               \
         if (f_setup_ != NULL)                                    \
             (*f_setup_)();                                       \
         yct_name(&yct_ctx_);                                     \
@@ -228,7 +252,7 @@ struct yct_context {
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags, \
             VNUT_YCT_FLAGS_BLOCKING_MODE                     \
             | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE              \
-            | VNUT_YCT_FLAGS_LOG_ENABLED);                   \
+            | VNUT_YCT_FLAGS_LOG);                           \
         yct_name(&yct_ctx_);                                 \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
                       VNUT_YCT_FLAGS_LOCKED);                \
@@ -283,6 +307,8 @@ if (p_yct_ctx_->out != NULL) {                                               \
     p_yct_ctx_->failed, p_yct_ctx_->suites, p_yct_ctx_->messages,            \
     p_yct_ctx_->warnings, p_yct_ctx_->checks - p_yct_ctx_->warnings,         \
     (float)((tests - p_yct_ctx_->failed) * 100) / (float)tests);             \
+    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)  \
+        == 0) {  VNUT_YCT_PRINT_ELAPSED_TIME(); }                            \
     if (p_yct_ctx_->failed > 0)                                              \
         VNUT_YCT_FPUTS("\n------> SOMETHING FAILED <-----\n");               \
     else {                                                                   \
@@ -293,8 +319,8 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                                                        \
 }
 
-/* Internal prints */
-#if (defined(YCT_DISABLE_INT64) || defined(YCT_OPT_DISABLE_INT64))
+// Internal prints
+#ifdef YCT_OPT_DISABLE_INT64
 
 #define VNUT_YCT_PRINT_VAR(var) {                                        \
     const size_t yct_pv_len_ = sizeof(var);                              \
@@ -325,6 +351,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
         default: break;                                                     \
     }                                                                       \
 }
+
 #endif
 
 #define VNUT_YCT_PRINT_MAIN(main_msg)                       \
@@ -355,18 +382,18 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                             \
 }
 
-#if ((defined YCT_OPT_DISABLE_LOG_SUPPORT) || defined(YCT_DISABLE_LOG_SUPPORT))
+#ifdef YCT_OPT_DISABLE_LOG
 #define VNUT_YCT_LOG(cond)
 #else
-#define VNUT_YCT_LOG(cond)                                                 \
-    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG_ENABLED)) { \
-        VNUT_YCT_PRINT("LOG", #cond);                                      \
-        if (p_yct_ctx_->out != NULL)                                       \
-            VNUT_YCT_FPUTC('\n');                                          \
+#define VNUT_YCT_LOG(cond)                                         \
+    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)) { \
+        VNUT_YCT_PRINT("LOG", #cond);                              \
+        if (p_yct_ctx_->out != NULL)                               \
+            VNUT_YCT_FPUTC('\n');                                  \
     }
 #endif
 
-/* Messages, Warnings, Assertions */
+// Messages, Warnings, Assertions
 #define YCT_MESSAGE(msg) {          \
     p_yct_ctx_->messages++;         \
     VNUT_YCT_LOG(msg);              \
@@ -897,4 +924,4 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                                    \
     }
 
-#endif /* YACUT_H_ */
+#endif // YACUT_H_
