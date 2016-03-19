@@ -4,12 +4,12 @@ Legend:
     * Changed
 
 
-1.1 ()
+2.0 ()
 
     + Log support
     + Timing support
     - Minor bugs on array functions
-    * Nomenclature of options
+    * Nomenclature (broken compatibility, incremented major version)
     * Esthetic internal code
 
 1.0 (28 Nov 2015)
