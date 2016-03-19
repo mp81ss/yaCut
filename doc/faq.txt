@@ -1,0 +1,23 @@
+1:  Q:  gcc -ansi gives errors. Why?
+    A:  yaCut requires C99. Replace -ansi with -std=c99. Ladsoft compilers
+        requires /9, etc.
+
+2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appears.
+        Why?
+    A:  Try defining YCT_OPT_DISABLE_INT64. If still not resolved, look at
+        YCT_FUNC_NAME macro.
+
+    2a: Q: In MS-DOS, cannot link. Why?
+    2a: A: Allow more segments for code (medium or large memory model).
+
+3:  Q:  I can compile/link, but generated executable is very big. Why?
+    A:  yaCut is macro based. If you can avoid log, try defining the macro
+        YCT_OPT_DISABLE_LOG. The macro YCT_OPT_DISABLE_TIMING just save some
+        bytes. yaCut cannot do anything else. You can always instruct your
+        compiler to enable space optimizations and strip symbols.
+        Last thing is to pack your exe.
+
+4:  Q:  I downloaded the current repository, very unstable and lot of errors.
+        Why?
+    A:  It is strongly recommmended to download from releases page. Development
+        may be done in all branches, so do not trust.
