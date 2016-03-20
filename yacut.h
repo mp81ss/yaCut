@@ -143,13 +143,10 @@ struct yct_context {
 
 // Log
 #ifdef YCT_OPT_DISABLE_LOG
-
 #define YCT_ENABLE_LOG()
 #define YCT_DISABLE_LOG()
 #define YCT_IS_LOG_ENABLED() 0
-
 #else
-
 #define YCT_ENABLE_LOG() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)
 
@@ -158,7 +155,6 @@ struct yct_context {
 
 #define YCT_IS_LOG_ENABLED() \
     VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)
-
 #endif
 
 // General
