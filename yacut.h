@@ -16,14 +16,14 @@
 #endif
 
 #ifndef YCT_FUNC_NAME
-#ifdef __GNUC__
-#define YCT_FUNC_NAME __PRETTY_FUNCTION__
-#elif (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
+#if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
 #define YCT_FUNC_NAME __FUNCTION__
 #elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
 #define YCT_FUNC_NAME __FUNC__
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
 #define YCT_FUNC_NAME __func__
+#elif __GNUC__
+#define YCT_FUNC_NAME __PRETTY_FUNCTION__
 #else
 #define YCT_FUNC_NAME "unknown"
 #endif
@@ -128,6 +128,11 @@ struct yct_context {
 
 // Timing
 #ifdef YCT_OPT_DISABLE_TIMING
+#ifdef _MSC_VER
+#pragma message("yaCut: TIMING DISABLED")
+#else
+#warning "yaCut: TIMING DISABLED"
+#endif
 #define YCT_DISABLE_TIMING()
 #define VNUT_YCT_GET_START_TIME()
 #define VNUT_YCT_PRINT_ELAPSED_TIME()
@@ -143,6 +148,11 @@ struct yct_context {
 
 // Log
 #ifdef YCT_OPT_DISABLE_LOG
+#ifdef _MSC_VER
+#pragma message("yaCut: LOG DISABLED")
+#else
+#warning "yaCut: LOG DISABLED"
+#endif
 #define YCT_ENABLE_LOG()
 #define YCT_DISABLE_LOG()
 #define YCT_IS_LOG_ENABLED() 0
@@ -210,7 +220,7 @@ struct yct_context {
         }                                                        \
     }
 
-#define NO_YCT_TEST_RUN(test_name) (void)(test_name);
+#define NO_YCT_TEST_RUN(test_name) (void)(test_name)
 
 #define YCT_TEST_ADD(yct_name)                                   \
     VNUT_YCT_IF_OK {                                             \
@@ -268,6 +278,38 @@ struct yct_context {
     if (VNUT_YCT_GET_BIT(yct_main_ctx_.flags, VNUT_YCT_FLAGS_IS_SUITE)) \
         yct_main_ctx_.suites++; else yct_main_ctx_.tests++;             \
     YCT_DUMP(); YCT_END(); return 0; }
+
+// Parallel
+#ifndef YCT_OPT_ENABLE_PARALLEL
+#define YCT_PARALLEL()
+#define YCT_PARALLEL_TEST(yct_name) YCT_TEST_RUN(yct_name)
+#else
+#define YCT_PARALLEL() _Pragma("omp parallel sections")
+#define YCT_PARALLEL_TEST(test_name) _Pragma("omp section") {    \
+    VNUT_YCT_IF_OK {                                             \
+        struct yct_context yct_ctx_;                             \
+        VNUT_YCT_INIT_DATA(yct_ctx_);                            \
+        yct_ctx_.out = p_yct_ctx_->out;                          \
+        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
+            VNUT_YCT_FLAGS_BLOCKING_MODE                         \
+            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
+            | VNUT_YCT_FLAGS_LOG);                               \
+        test_name(&yct_ctx_);                                    \
+        _Pragma("omp atomic")                                    \
+        p_yct_ctx_->tests++;                                     \
+        _Pragma("omp atomic")                                    \
+        p_yct_ctx_->warnings += yct_ctx_.warnings;               \
+        _Pragma("omp atomic")                                    \
+        p_yct_ctx_->checks += yct_ctx_.checks;                   \
+        _Pragma("omp atomic")                                    \
+        p_yct_ctx_->messages += yct_ctx_.messages;               \
+        if (yct_ctx_.failed > 0) {                               \
+        _Pragma("omp critical") {                                \
+            VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
+                                         VNUT_YCT_FLAGS_LOCKED); \
+            p_yct_ctx_->failed = 1;                              \
+        } } } }
+#endif
 
 #define VNUT_YCT_FPUTC(c) ((void)fputc((c), p_yct_ctx_->out))
 #define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, str))
