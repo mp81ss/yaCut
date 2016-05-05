@@ -8,7 +8,8 @@ code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
 yaCut support some input parameter (see next section).
 Next section describes the macro you can define BEFORE including yaCut.
-You can ignore them unless you have compilation errors.
+You can ignore them unless you have compilation errors. Disabling some feature
+is useful to reduce executable size (see faq).
 Then follows a list of all available macros (excluding the *_MSG version).
 
 
@@ -27,12 +28,20 @@ YCT_OPT_DISABLE_LOG
 Defining this macro remove log support. If you don't need log, you can have
 smaller executable.
 
+YCT_OPT_DISABLE_TIMING
+Defining this macro remove time measurement support. If you don't need time,
+you can have smaller executable.
+
+YCT_OPT_ENABLE_PARALLEL
+Define this macro to enable parallel tests execution.
+See section "Parallel" below.
+
 YCT_FUNC_NAME
 This is not a real parameter. This is the macro (if defined so) that the
-compiler offer to retrieve the current function name. It is needed by yaCut, so
-if compilation fails due to this macro, you can redefine it. yaCut tries to
-guess it, and usually succeeds. If it fails, you can help it by
-defining it with the value your compiler assigns to the current function name.
+compilers offer to retrieve the current function name. It is needed by yaCut,
+so if compilation fails due to this macro, you can redefine it. yaCut tries to
+guess it, and usually succeeds. If it fails, you can help it by defining it
+with the value your compiler assign to the current function name.
 Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
 The worst case is to define it to a constant ("unknown") to allow compilation.
 
@@ -212,7 +221,7 @@ blocking mode was set). Otherwise returns 0.
 
 
 SECTION: Log
-The logging facility of yacut is quite simple, but is very useful for example
+The logging facility of yaCut is quite simple, but is very useful for example
 when the test app crashes and you don't know where. Enabling log just means that
 BEFORE a test/assertions is performed, its file, line and test code are printed
 with a "LOG" prefix.
@@ -233,6 +242,40 @@ Otherwise returns 0.
 -----------------------------------------------------------------------------
 
 
+SECTION: Timing
+The timing feature of yaCut just prints the (CPU) time of execution.
+It is enabled by default.
+See code example ex_???.c
+
+YCT_DISABLE_TIMING();
+Disable timing, execution time is not printed.
+
+
+-----------------------------------------------------------------------------
+
+
+SECTION: Parallel
+The parallel feature of yaCut allows the execution of multiple tests
+in parallel. Please note that tests should not write shared data.
+The number of tests really executed in parallel is equal to the physical
+number of cores available to the application.
+It relies on the OpenMP v ?.? framework and it is disabled by
+default. To get parallel test execution define YCT_OPT_ENABLE_PARALLEL before
+including yaCut and remember to compile/link with OpenMP support enabled.
+See code example ex_paral.c
+
+YCT_PARALLEL() { ... }
+Define a parallel tests context. All tests added with YCT_PARALLEL_TEST() will
+run in parallel.
+
+YCT_PARALLEL_TEST(test)
+Run test in parallel with other tests added with this macro.
+Please note that the semicolon here is FORBIDDEN.
+
+
+-----------------------------------------------------------------------------
+
+
 SECTION: Assertions
 Assertions are the basic entities to test software. In this section are listed
 all assertions you can use. Except YCT_MESSAGE and YCT_FAIL that already have
@@ -241,7 +284,6 @@ message. Just append '_MSG' to their original name and append the message as
 last parameter. The message can be a string literal or a char*. UTF-8 strings
 are accepted but wchar_t* strings or literals do not work. See YCT_ASSERT_MSG
 below as example.
-You will notice that most macros have the _NOT_ version to negate condition.
 Assertions are typically used inside YCT_TEST block. However you can use them
 inside a YCT_SUITE scope too. They can be even used in YCT_BEGIN context if it
 resides inside a function that returns void. YCT_MESSAGE doesn't have this

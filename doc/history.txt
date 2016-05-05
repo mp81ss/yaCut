@@ -1,16 +1,14 @@
-Legend:
-    + Added
-    - Fixed
-    * Changed
-
-
 2.0 ()
 
-    + Log support
-    + Timing support
-    - Minor bugs on array functions
-    * Nomenclature (broken compatibility, incremented major version)
-    * Esthetic internal code
+    ADD: Log support
+    ADD: Timing support
+    ADD: Parallel tests support
+    ADD: Preprocessor message for each yaCut option (YCT_OPT_...) specified
+    FIX: Minor bugs on array functions
+    CHG: Naming convention of input options (now all begin with YCT_OPT_...)
+         (Broken compatibility with v1.0, so changed major version)
+    CHG: Esthetic of internal code
+
 
 1.0 (28 Nov 2015)
 

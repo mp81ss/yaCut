@@ -128,11 +128,13 @@ struct yct_context {
 
 // Timing
 #ifdef YCT_OPT_DISABLE_TIMING
+
 #ifdef _MSC_VER
 #pragma message("yaCut: TIMING DISABLED")
 #else
 #warning "yaCut: TIMING DISABLED"
 #endif
+
 #define YCT_DISABLE_TIMING()
 #define VNUT_YCT_GET_START_TIME()
 #define VNUT_YCT_PRINT_ELAPSED_TIME()
@@ -148,11 +150,13 @@ struct yct_context {
 
 // Log
 #ifdef YCT_OPT_DISABLE_LOG
+
 #ifdef _MSC_VER
 #pragma message("yaCut: LOG DISABLED")
 #else
 #warning "yaCut: LOG DISABLED"
 #endif
+
 #define YCT_ENABLE_LOG()
 #define YCT_DISABLE_LOG()
 #define YCT_IS_LOG_ENABLED() 0
@@ -284,8 +288,21 @@ struct yct_context {
 #define YCT_PARALLEL()
 #define YCT_PARALLEL_TEST(yct_name) YCT_TEST_RUN(yct_name)
 #else
+#ifdef _MSC_VER
+#pragma message("yaCut: PARALLEL ENABLED")
+#define YCT_PARALLEL() __pragma(omp parallel sections)
+#define VNUT_YCT_SECTION __pragma(omp section) 
+#define VNUT_YCT_ATOMIC __pragma(omp atomic)
+#define VNUT_YCT_CRITICAL __pragma(omp critical)
+#else
+#warning "yaCut: PARALLEL ENABLED"
 #define YCT_PARALLEL() _Pragma("omp parallel sections")
-#define YCT_PARALLEL_TEST(test_name) _Pragma("omp section") {    \
+#define VNUT_YCT_SECTION _Pragma("omp section") 
+#define VNUT_YCT_ATOMIC _Pragma("omp atomic")
+#define VNUT_YCT_CRITICAL _Pragma("omp critical")
+#endif
+
+#define YCT_PARALLEL_TEST(test_name) VNUT_YCT_SECTION {          \
     VNUT_YCT_IF_OK {                                             \
         struct yct_context yct_ctx_;                             \
         VNUT_YCT_INIT_DATA(yct_ctx_);                            \
@@ -295,16 +312,16 @@ struct yct_context {
             | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
             | VNUT_YCT_FLAGS_LOG);                               \
         test_name(&yct_ctx_);                                    \
-        _Pragma("omp atomic")                                    \
+        VNUT_YCT_ATOMIC                                          \
         p_yct_ctx_->tests++;                                     \
-        _Pragma("omp atomic")                                    \
+        VNUT_YCT_ATOMIC                                          \
         p_yct_ctx_->warnings += yct_ctx_.warnings;               \
-        _Pragma("omp atomic")                                    \
+        VNUT_YCT_ATOMIC                                          \
         p_yct_ctx_->checks += yct_ctx_.checks;                   \
-        _Pragma("omp atomic")                                    \
+        VNUT_YCT_ATOMIC                                          \
         p_yct_ctx_->messages += yct_ctx_.messages;               \
         if (yct_ctx_.failed > 0) {                               \
-        _Pragma("omp critical") {                                \
+        VNUT_YCT_CRITICAL {                                      \
             VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
                                          VNUT_YCT_FLAGS_LOCKED); \
             p_yct_ctx_->failed = 1;                              \
@@ -358,6 +375,12 @@ if (p_yct_ctx_->out != NULL) {                                               \
 
 // Internal prints
 #ifdef YCT_OPT_DISABLE_INT64
+
+#ifdef _MSC_VER
+#pragma message("yaCut: INT64 DISABLED")
+#else
+#warning "yaCut: INT64 DISABLED"
+#endif
 
 #define VNUT_YCT_PRINT_VAR(var) {                                        \
     const size_t yct_pv_len_ = sizeof(var);                              \
