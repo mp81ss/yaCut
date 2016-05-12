@@ -7,9 +7,12 @@
     FIX: Minor bugs on array functions
     CHG: Naming convention of input options (now all begin with YCT_OPT_...)
          (Broken compatibility with v1.0, so changed major version)
+    DEL: YCT_GET_DATA
+         (Broken compatibility with v1.0, so changed major version)
+    ADD: YCT_MERGE_CONTEXT
     CHG: Esthetic of internal code
 
 
 1.0 (28 Nov 2015)
 
-    First version
+    Initial version

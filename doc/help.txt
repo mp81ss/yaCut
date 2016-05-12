@@ -64,8 +64,11 @@ YCT_SET_OUTPUT(handle);
 Set the output handle. The default is stdout. You can pass your FILE* object.
 Handle must be already opened and writeable.
 
-YCT_GET_DATA(context);
-The current struct yct_context is copied to context. For advanced users.
+YCT_MERGE_CONTEXT(ctx_dest, ctx_src);
+Data stored in ctx_src is added to ctx_dest. Contexts are of type
+struct yct_context. Usefull to have one dump only or more generally to have
+less context to process. You can pass the macro YCT_CURRENT_CONTEXT to use
+the current context. For advanced users.
 
 YCT_GET_RETURN_VALUE(status);
 Return an integer according to current context.

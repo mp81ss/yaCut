@@ -79,7 +79,12 @@ struct yct_context {
 
 #define YCT_SET_OUTPUT(handle) (yct_main_ctx_.out = (handle))
 
-#define YCT_GET_DATA(ctx) ((ctx) = *p_yct_ctx_)
+#define YCT_CURRENT_CONTEXT (*p_yct_ctx_)
+
+#define YCT_MERGE_CONTEXT(ctx_dst, ctx_src) ctx_dst.suites += ctx_src.suites; \
+    ctx_dst.messages += ctx_src.messages; ctx_dst.tests += ctx_src.tests;     \
+    ctx_dst.checks += ctx_src.checks; ctx_dst.warnings += ctx_src.warnings;   \
+    ctx_dst.failed += ctx_src.failed;
 
 #define YCT_GET_RETURN_VALUE(val) {   \
     if (p_yct_ctx_->failed > 0)       \
@@ -131,7 +136,7 @@ struct yct_context {
 
 #ifdef _MSC_VER
 #pragma message("yaCut: TIMING DISABLED")
-#else
+#elif __GNUC__
 #warning "yaCut: TIMING DISABLED"
 #endif
 
@@ -153,7 +158,7 @@ struct yct_context {
 
 #ifdef _MSC_VER
 #pragma message("yaCut: LOG DISABLED")
-#else
+#elif __GNUC__
 #warning "yaCut: LOG DISABLED"
 #endif
 
@@ -291,13 +296,15 @@ struct yct_context {
 #ifdef _MSC_VER
 #pragma message("yaCut: PARALLEL ENABLED")
 #define YCT_PARALLEL() __pragma(omp parallel sections)
-#define VNUT_YCT_SECTION __pragma(omp section) 
+#define VNUT_YCT_SECTION __pragma(omp section)
 #define VNUT_YCT_ATOMIC __pragma(omp atomic)
 #define VNUT_YCT_CRITICAL __pragma(omp critical)
 #else
+#ifdef __GNUC__
 #warning "yaCut: PARALLEL ENABLED"
+#endif
 #define YCT_PARALLEL() _Pragma("omp parallel sections")
-#define VNUT_YCT_SECTION _Pragma("omp section") 
+#define VNUT_YCT_SECTION _Pragma("omp section")
 #define VNUT_YCT_ATOMIC _Pragma("omp atomic")
 #define VNUT_YCT_CRITICAL _Pragma("omp critical")
 #endif
@@ -378,7 +385,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 
 #ifdef _MSC_VER
 #pragma message("yaCut: INT64 DISABLED")
-#else
+#elif __GNUC__
 #warning "yaCut: INT64 DISABLED"
 #endif
 
