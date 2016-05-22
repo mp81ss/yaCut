@@ -282,10 +282,9 @@ struct yct_context {
 
 #define YCT_END() (void)yct_main_ctx_; }
 
-#define YCT_MAIN(entry) int main(void) {                                \
-    YCT_BEGIN(""); entry(&yct_main_ctx_);                               \
-    if (VNUT_YCT_GET_BIT(yct_main_ctx_.flags, VNUT_YCT_FLAGS_IS_SUITE)) \
-        yct_main_ctx_.suites++; else yct_main_ctx_.tests++;             \
+#define YCT_MAIN(entry) int main(void) { YCT_BEGIN(""); entry(&yct_main_ctx_); \
+    if (VNUT_YCT_GET_BIT(yct_main_ctx_.flags, VNUT_YCT_FLAGS_IS_SUITE))        \
+        yct_main_ctx_.suites++; else yct_main_ctx_.tests++;                    \
     YCT_DUMP(); YCT_END(); return 0; }
 
 // Parallel
@@ -309,29 +308,31 @@ struct yct_context {
 #define VNUT_YCT_CRITICAL _Pragma("omp critical")
 #endif
 
-#define YCT_PARALLEL_TEST(test_name) VNUT_YCT_SECTION {          \
-    VNUT_YCT_IF_OK {                                             \
-        struct yct_context yct_ctx_;                             \
-        VNUT_YCT_INIT_DATA(yct_ctx_);                            \
-        yct_ctx_.out = p_yct_ctx_->out;                          \
-        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,     \
-            VNUT_YCT_FLAGS_BLOCKING_MODE                         \
-            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                  \
-            | VNUT_YCT_FLAGS_LOG);                               \
-        test_name(&yct_ctx_);                                    \
-        VNUT_YCT_ATOMIC                                          \
-        p_yct_ctx_->tests++;                                     \
-        VNUT_YCT_ATOMIC                                          \
-        p_yct_ctx_->warnings += yct_ctx_.warnings;               \
-        VNUT_YCT_ATOMIC                                          \
-        p_yct_ctx_->checks += yct_ctx_.checks;                   \
-        VNUT_YCT_ATOMIC                                          \
-        p_yct_ctx_->messages += yct_ctx_.messages;               \
-        if (yct_ctx_.failed > 0) {                               \
-        VNUT_YCT_CRITICAL {                                      \
-            VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
-                                         VNUT_YCT_FLAGS_LOCKED); \
-            p_yct_ctx_->failed = 1;                              \
+#define YCT_PARALLEL_TEST(test_name) VNUT_YCT_SECTION         \
+{                                                             \
+    VNUT_YCT_IF_OK {                                          \
+        struct yct_context yct_ctx_;                          \
+        VNUT_YCT_INIT_DATA(yct_ctx_);                         \
+        yct_ctx_.out = p_yct_ctx_->out;                       \
+        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,  \
+                          VNUT_YCT_FLAGS_BLOCKING_MODE        \
+                          | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE \
+                          | VNUT_YCT_FLAGS_LOG);              \
+        test_name(&yct_ctx_);                                 \
+        VNUT_YCT_ATOMIC                                       \
+        p_yct_ctx_->tests++;                                  \
+        VNUT_YCT_ATOMIC                                       \
+        p_yct_ctx_->warnings += yct_ctx_.warnings;            \
+        VNUT_YCT_ATOMIC                                       \
+        p_yct_ctx_->checks += yct_ctx_.checks;                \
+        VNUT_YCT_ATOMIC                                       \
+        p_yct_ctx_->messages += yct_ctx_.messages;            \
+        if (yct_ctx_.failed > 0) {                            \
+            VNUT_YCT_CRITICAL {                               \
+                VNUT_YCT_COPY_BIT(yct_ctx_.flags,             \
+                                  p_yct_ctx_->flags,          \
+                                  VNUT_YCT_FLAGS_LOCKED);     \
+            p_yct_ctx_->failed = 1;                           \
         } } } }
 #endif
 

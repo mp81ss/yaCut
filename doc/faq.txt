@@ -2,7 +2,7 @@
     A:  yaCut requires C99. Replace -ansi with -std=c99. Ladsoft compilers
         requires /9, etc.
 
-2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appears.
+2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appear.
         Why?
     A:  Try defining YCT_OPT_DISABLE_INT64. If still not resolved, look at
         YCT_FUNC_NAME macro.
@@ -21,3 +21,8 @@
         Why?
     A:  It is strongly recommmended to download from releases page. Development
         may be done in all branches, so do not trust.
+
+5:  Q:  Pelles C compiler give errors compiling parallel-enabled code. Why?
+    A:  The Pelles C preprocessor implementation is not compatible with yaCut
+        implementation. You can use Pelles without enabling parallel tests.
+        Technically not a bug, sorry.
