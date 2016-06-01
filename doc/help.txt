@@ -262,9 +262,12 @@ The parallel feature of yaCut allows the execution of multiple tests
 in parallel. Please note that tests should not write shared data.
 The number of tests really executed in parallel is equal to the physical
 number of cores available to the application.
-It relies on the OpenMP framework and it is disabled by
-default. To get parallel tests execution, define YCT_OPT_ENABLE_PARALLEL before
-including yaCut and remember to compile/link with OpenMP support.
+It relies on the OpenMP framework and it is disabled by default.
+To skip parallel tests, you must use the "DISABLE_" prefix in tests declaration.
+Standard suites do not support parallel tests directly. Inside a suite, you can
+add tests that call another yaCut context in which you declare parallel tests.
+To get parallel tests execution, define YCT_OPT_ENABLE_PARALLEL before including
+yaCut and remember to compile/link with OpenMP support.
 See code example ex_paral.c
 
 YCT_PARALLEL() { ... }

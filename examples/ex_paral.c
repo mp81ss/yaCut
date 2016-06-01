@@ -48,10 +48,17 @@ int main(void)
 {
     YCT_BEGIN("Parallel");
 
-    // pt1 and pt2 can run in parallel
-    YCT_PARALLEL() {
-        YCT_PARALLEL_TEST(pt1) // no semicolon here
+    YCT_PARALLEL()
+    {
+        YCT_SCHEDULE_TEST()
+        YCT_PARALLEL_TEST(pt1)
+        YCT_JOIN_TEST()
+        YCT_COLLECT_TEST_RESULTS()
+
+        YCT_SCHEDULE_TEST()
         YCT_PARALLEL_TEST(pt2)
+        YCT_JOIN_TEST()
+        YCT_COLLECT_TEST_RESULTS()
     }
 
     YCT_DUMP();
