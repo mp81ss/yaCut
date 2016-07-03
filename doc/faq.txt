@@ -1,5 +1,5 @@
 1:  Q:  gcc -ansi gives errors. Why?
-    A:  yaCut requires C99. Replace -ansi with -std=c99. Ladsoft compilers
+    A:  yaCut relies on C99. Replace -ansi with -std=c99. Ladsoft compilers
         requires /9, etc.
 
 2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appear.
@@ -16,13 +16,9 @@
         bytes. yaCut cannot do anything else. You can always instruct your
         compiler to enable space optimizations and strip symbols.
         Last thing is to pack your exe.
+        Splitting your code in several smaller files may help.
 
 4:  Q:  I downloaded the current repository, very unstable and lot of errors.
         Why?
     A:  It is strongly recommmended to download from releases page. Development
         may be done in all branches, so do not trust.
-
-5:  Q:  Pelles C compiler give errors compiling parallel-enabled code. Why?
-    A:  The Pelles C preprocessor implementation is not compatible with yaCut
-        implementation. You can use Pelles without enabling parallel tests.
-        Technically not a bug, sorry.
