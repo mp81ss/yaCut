@@ -61,12 +61,12 @@ YCT_GET_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
 YCT_SET_OUTPUT(handle);
-Set the output handle. The default is stdout. You can pass your FILE* object.
-Handle must be already opened and writeable.
+Set the output handle. The default is stdout. You can pass your FILE* variable.
+Handle must be already opened and writable.
 
 YCT_MERGE_CONTEXT(ctx_dest, ctx_src);
 Data stored in ctx_src is added to ctx_dest. Contexts are of type
-struct yct_context. Usefull to have one dump only or more generally to have
+struct yct_context. Useful to have one dump only or more generally to have
 less context to process. You can pass the macro YCT_CURRENT_CONTEXT to use
 the current context. For advanced users.
 
