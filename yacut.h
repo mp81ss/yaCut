@@ -18,25 +18,25 @@
 #ifndef YCT_FUNC_NAME
 #if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
 #define YCT_FUNC_NAME __FUNCTION__
-#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+#elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x550))
 #define YCT_FUNC_NAME __FUNC__
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+#elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
 #define YCT_FUNC_NAME __func__
-#elif __GNUC__
+#elif defined(__GNUC__)
 #define YCT_FUNC_NAME __PRETTY_FUNCTION__
 #else
-#define YCT_FUNC_NAME "unknown"
+#define YCT_FUNC_NAME "YCT_TEST"
 #endif
 #endif
 
-#define VNUT_YCT_FLAGS_BLOCKING_MODE        0x1
-#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE   0x2
-#define VNUT_YCT_FLAGS_LOCKED               0x4
-#define VNUT_YCT_FLAGS_DISABLED             0x8
-#define VNUT_YCT_FLAGS_IS_SUITE             0x10
-#define VNUT_YCT_FLAGS_LOG                  0x20
-#define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40
-#define VNUT_YCT_FLAGS_LAST_FAILED          0x80
+#define VNUT_YCT_FLAGS_BLOCKING_MODE        0x1U
+#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE   0x2U
+#define VNUT_YCT_FLAGS_LOCKED               0x4U
+#define VNUT_YCT_FLAGS_DISABLED             0x8U
+#define VNUT_YCT_FLAGS_IS_SUITE             0x10U
+#define VNUT_YCT_FLAGS_LOG                  0x20U
+#define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40U
+#define VNUT_YCT_FLAGS_LAST_FAILED          0x80U
 
 #define YCT_GET_NAME()      "yaCut"
 #define YCT_VERSION_MAJOR() 2
@@ -70,7 +70,7 @@ struct yct_context {
 #define VNUT_YCT_GET_BIT(var, mask) ((var) & (mask))
 #define VNUT_YCT_CLEAR_BIT(var, mask) ((var) &= ~(mask))
 #define VNUT_YCT_SET_BIT(var, mask) { VNUT_YCT_CLEAR_BIT((var), (mask)); \
-    (var) |= (mask); }
+                                      (var) |= (mask); }
 #define VNUT_YCT_COPY_BIT(src, dest, mask) \
     VNUT_YCT_SET_BIT((dest), VNUT_YCT_GET_BIT((src), (mask)));
 
