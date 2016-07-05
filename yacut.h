@@ -139,9 +139,9 @@ struct yct_context {
 // Timing
 #ifdef YCT_OPT_DISABLE_TIMING
 
-#ifdef _MSC_VER
+#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: TIMING DISABLED")
-#elif defined __GNUC__
+#elif defined(__GNUC__)
 #warning "yaCut: TIMING DISABLED"
 #endif
 
@@ -161,9 +161,9 @@ struct yct_context {
 // Log
 #ifdef YCT_OPT_DISABLE_LOG
 
-#ifdef _MSC_VER
+#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: LOG DISABLED")
-#elif defined __GNUC__
+#elif defined(__GNUC__)
 #warning "yaCut: LOG DISABLED"
 #endif
 
@@ -389,9 +389,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
 // Internal prints
 #ifdef YCT_OPT_DISABLE_INT64
 
-#ifdef _MSC_VER
+#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: INT64 DISABLED")
-#elif __GNUC__
+#elif defined(__GNUC__)
 #warning "yaCut: INT64 DISABLED"
 #endif
 
