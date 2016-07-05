@@ -138,13 +138,7 @@ struct yct_context {
 
 // Timing
 #ifdef YCT_OPT_DISABLE_TIMING
-
-#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: TIMING DISABLED")
-#elif defined(__GNUC__)
-#warning "yaCut: TIMING DISABLED"
-#endif
-
 #define YCT_DISABLE_TIMING()
 #define VNUT_YCT_GET_START_TIME()
 #define VNUT_YCT_PRINT_ELAPSED_TIME()
@@ -160,13 +154,7 @@ struct yct_context {
 
 // Log
 #ifdef YCT_OPT_DISABLE_LOG
-
-#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: LOG DISABLED")
-#elif defined(__GNUC__)
-#warning "yaCut: LOG DISABLED"
-#endif
-
 #define YCT_ENABLE_LOG()
 #define YCT_DISABLE_LOG()
 #define YCT_IS_LOG_ENABLED() 0
@@ -304,15 +292,12 @@ struct yct_context {
 #define YCT_JOIN_TEST()
 #define YCT_COLLECT_TEST_RESULTS()
 #else
-#ifdef _MSC_VER
 #pragma message("yaCut: PARALLEL ENABLED")
+#ifdef _MSC_VER
 #define YCT_PARALLEL() __pragma(omp parallel sections)
 #define YCT_SCHEDULE_TEST() __pragma(omp section)
 #define YCT_JOIN_TEST() __pragma(omp critical)
 #else
-#ifdef __GNUC__
-#warning "yaCut: PARALLEL ENABLED"
-#endif
 #define YCT_PARALLEL() _Pragma("omp parallel sections")
 #define YCT_SCHEDULE_TEST() _Pragma("omp section")
 #define YCT_JOIN_TEST() _Pragma("omp critical")
