@@ -374,11 +374,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 // Internal prints
 #ifdef YCT_OPT_DISABLE_INT64
 
-#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: INT64 DISABLED")
-#elif defined(__GNUC__)
-#warning "yaCut: INT64 DISABLED"
-#endif
 
 #define VNUT_YCT_PRINT_VAR(var) {                                        \
     const size_t yct_pv_len_ = sizeof(var);                              \
