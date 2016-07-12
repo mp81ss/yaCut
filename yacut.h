@@ -29,14 +29,14 @@
 #endif
 #endif
 
-#define VNUT_YCT_FLAGS_BLOCKING_MODE        0x1U
-#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE   0x2U
-#define VNUT_YCT_FLAGS_LOCKED               0x4U
-#define VNUT_YCT_FLAGS_DISABLED             0x8U
-#define VNUT_YCT_FLAGS_IS_SUITE             0x10U
-#define VNUT_YCT_FLAGS_LOG                  0x20U
-#define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40U
-#define VNUT_YCT_FLAGS_LAST_FAILED          0x80U
+#define VNUT_YCT_FLAGS_BLOCKING_MODE        0x1
+#define VNUT_YCT_FLAGS_FULL_BLOCKING_MODE   0x2
+#define VNUT_YCT_FLAGS_LOCKED               0x4
+#define VNUT_YCT_FLAGS_DISABLED             0x8
+#define VNUT_YCT_FLAGS_IS_SUITE             0x10
+#define VNUT_YCT_FLAGS_LOG                  0x20
+#define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40
+#define VNUT_YCT_FLAGS_LAST_FAILED          0x80
 
 #define YCT_GET_NAME()      "yaCut"
 #define YCT_VERSION_MAJOR() 2
@@ -262,6 +262,8 @@ struct yct_context {
         struct yct_context yct_ctx_;                         \
         VNUT_YCT_INIT_DATA(yct_ctx_);                        \
         yct_ctx_.out = p_yct_ctx_->out;                      \
+        VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                \
+                           VNUT_YCT_FLAGS_LAST_FAILED);      \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags, \
             VNUT_YCT_FLAGS_BLOCKING_MODE                     \
             | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE              \
@@ -269,6 +271,9 @@ struct yct_context {
         yct_name(&yct_ctx_);                                 \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
                       VNUT_YCT_FLAGS_LOCKED);                \
+        if (yct_ctx_.failed > 0) {                           \
+            VNUT_YCT_SET_BIT(p_yct_ctx_->flags,              \
+                             VNUT_YCT_FLAGS_LAST_FAILED); }  \
         p_yct_ctx_->suites++;                                \
         p_yct_ctx_->tests += yct_ctx_.tests;                 \
         p_yct_ctx_->failed += yct_ctx_.failed;               \
@@ -374,11 +379,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
 // Internal prints
 #ifdef YCT_OPT_DISABLE_INT64
 
-#if ((defined(_MSC_VER) || (defined(__INTEL_COMPILER)))
 #pragma message("yaCut: INT64 DISABLED")
-#elif defined(__GNUC__)
-#warning "yaCut: INT64 DISABLED"
-#endif
 
 #define VNUT_YCT_PRINT_VAR(var) {                                        \
     const size_t yct_pv_len_ = sizeof(var);                              \
