@@ -165,7 +165,7 @@ struct yct_context {
         if (yct_ctx_.failed > 0) {                                \
             VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,  \
                                           VNUT_YCT_FLAGS_LOCKED); \
-            p_yct_ctx_->failed = 1;                               \
+            p_yct_ctx_->failed++;                                 \
         }                                                         \
     }
 
@@ -191,7 +191,7 @@ struct yct_context {
         if (yct_ctx_.failed > 0) {                               \
             VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
                           VNUT_YCT_FLAGS_LOCKED);                \
-            p_yct_ctx_->failed = 1;                              \
+            p_yct_ctx_->failed++;                                \
         }                                                        \
     }
 
