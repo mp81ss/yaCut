@@ -338,8 +338,8 @@ Abort current test if ptr is not NULL.
 YCT_ASSERT_NOT_NULL(ptr);
 Abort current test if ptr is NULL.
 
-YCT_ASSERT_EQUAL_STR(str1, str2);
-Abort current test if string str1 and str2 are different.
+YCT_ASSERT_EQUAL_STR(expected_str, actual_str);
+Abort current test if string expected_str and actual_str are different.
 char and wchar_t array/pointers are typically expected as arguments.
 
 YCT_ASSERT_NOT_EQUAL_STR(str1, str2);
@@ -347,17 +347,17 @@ Abort current test if string str1 and str2 are equal.
 char and wchar_t array/pointers and/or string literals are typically expected
 as arguments.
 
-YCT_ASSERT_EQUAL_ARRAY(a1, a2, len);
-Abort current test if arrays a1 and a2 have a different element in range
+YCT_ASSERT_EQUAL_ARRAY(expected_array1, expected_array2, len);
+Abort current test if arrays expected_array1 and expected_array2 have at least
+a different element in range [0, len].
+
+YCT_ASSERT_NOT_EQUAL_ARRAY(array1, array2, len);
+Abort current test if arrays array1 and array2 have all elements equal in range
 [0, len].
 
-YCT_ASSERT_NOT_EQUAL_ARRAY(str1, str2, len);
-Abort current test if arrays a1 and a2 have all elements equal in range
-[0, len].
-
-YCT_ASSERT_EQUAL_OBJ(obj1, obj2, fcmp);
-Abort current test if obj1 and obj2 are different. fcmp is the function used
-to compare passed objects. The fcmp prototype must be:
+YCT_ASSERT_EQUAL_OBJ(expected_obj, actual_obj, fcmp);
+Abort current test if expected_obj and actual_obj are different. fcmp is the
+function used to compare passed objects. The fcmp prototype must be:
 int fcmp(const T* pObj1, const T* pObj2);
 where T is the type of BOTH objects. fcmp must return 0 if equal.
 Note that constant pointers are preferred, but just T* can be passed.
@@ -365,13 +365,13 @@ Note that constant pointers are preferred, but just T* can be passed.
 YCT_ASSERT_NOT_EQUAL_OBJ(obj1, obj2, fcmp);
 Abort current test if obj1 and obj2 are equal. See notes above.
 
-YCT_ASSERT_EQUAL_FLOAT(a, b, t);
-Abort current test if abs(a - b) > t. Numbers a and b are considered equal if
-their difference is less or equal than tolerance t.
-Typical usage is with float and double, FLOATing point numbers generically.
+YCT_ASSERT_EQUAL_FLOAT(expected_float, actual_float, tolerance);
+Abort current test if abs(expected_float - actual_float) > tolerance.
+Numbers a and b are considered equal if their difference is less or equal than
+tolerance. Typical usage is with float and double.
 
-YCT_ASSERT_NOT_EQUAL_FLOAT(a, b, t);
-Abort current test if abs(a - b) <= t.
+YCT_ASSERT_NOT_EQUAL_FLOAT(a, b, tolerance);
+Abort current test if abs(a - b) <= tolerance.
 
 
 -----------------------------------------------------------------------------
