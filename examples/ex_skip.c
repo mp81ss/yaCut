@@ -31,6 +31,12 @@ YCT_SUITE(suite_dangerous, NULL, NULL)
 }
 YCT_SUITE_END
 
+YCT_SUITE(suite_safe, NULL, NULL)
+{
+    NO_YCT_TEST_ADD(test_dangerous);
+}
+YCT_SUITE_END
+
 YCT_TEST(test)
 {
     YCT_ASSERT_EQUAL_MSG(0, x, "Initially defined");
@@ -41,12 +47,15 @@ int main(void)
 {
     YCT_BEGIN("Skip");
 
+    YCT_ENABLE_LOG();
+
     /* These 2 won't be executed:
        Notice tha "DISABLE_" prepended above in test/suite declaration,
        1st method.
      */
     YCT_TEST_RUN(test_skipped);
     YCT_SUITE_RUN(suite_skipped);
+
 
     /* These 2 won't be executed:
        Notice the "NO_" prepended below to test/suite run directives,
@@ -55,8 +64,13 @@ int main(void)
     NO_YCT_TEST_RUN(test_dangerous);
     NO_YCT_SUITE_RUN(suite_dangerous);
 
+    /* Suite here run regularly, but its test in not added */
+    YCT_SUITE_RUN(suite_safe);
+
+
     /* After YCT_DISABLE() directive nothing will be executed.
-       Use YCT_ENABLE() to restore default behaviour,
+       Use YCT_ENABLE() to restore default behaviour. Here test_skipped and
+       suite_skipped won't execute.
        3rd method.
      */
     YCT_DISABLE();

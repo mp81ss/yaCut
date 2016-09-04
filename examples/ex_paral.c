@@ -51,12 +51,12 @@ int main(void)
     YCT_PARALLEL()
     {
         YCT_SCHEDULE_TEST()
-        YCT_PARALLEL_TEST(pt1)
+        YCT_PARALLEL_TEST(pt1) // pt1 will run in parallel...
         YCT_JOIN_TEST()
         YCT_COLLECT_TEST_RESULTS()
 
         YCT_SCHEDULE_TEST()
-        YCT_PARALLEL_TEST(pt2)
+        YCT_PARALLEL_TEST(pt2) // ... with pt2
         YCT_JOIN_TEST()
         YCT_COLLECT_TEST_RESULTS()
     }

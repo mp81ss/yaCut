@@ -1,18 +1,22 @@
 2.0 (  2016)
 
+    FIX: Number of failed tests (fixed in v1.0.1 too)
+    FIX: Minor bugs on array functions
     ADD: Log support
     ADD: Timing support
     ADD: Parallel tests support
     ADD: Preprocessor message for each yaCut option (YCT_OPT_...) specified
-         For gcc, microsoft and intel compilers only
-    FIX: Number of failed tests reported in dump
-    FIX: Minor bugs on array functions
+    ADD: Several utilities macro (see file help.txt)
     CHG: Naming convention of input options (now all begin with YCT_OPT_...)
-         (Broken compatibility with v1.0, so changed major version)
-    DEL: YCT_GET_DATA
-         (Broken compatibility with v1.0, so changed major version)
-    ADD: YCT_MERGE_CONTEXT
+         (Broken compatibility with version 1.x, so changed major version)
     CHG: Esthetic of internal code
+    DEL: YCT_GET_DATA
+         (Broken compatibility with version 1.x, so changed major version)
+
+
+1.0.1 (03 Sep 2016)
+
+    FIX: Error on managing failed total and documentation fix
 
 
 1.0 (28 Nov 2015)

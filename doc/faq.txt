@@ -11,14 +11,14 @@
     2a: A: Allow more segments for code (medium or large memory model).
 
 3:  Q:  I can compile/link, but generated executable is very big. Why?
-    A:  yaCut is macro based. If you can avoid log, try defining the macro
+    A:  yaCut is macro based. If you can, avoid log, by defining the macro
         YCT_OPT_DISABLE_LOG. The macro YCT_OPT_DISABLE_TIMING just save some
         bytes. yaCut cannot do anything else. You can always instruct your
         compiler to enable space optimizations and strip symbols.
         Last thing is to pack your exe.
         Splitting your code in several smaller files may help.
 
-4:  Q:  I downloaded the current repository, very unstable and lot of errors.
-        Why?
-    A:  It is strongly recommmended to download from releases page. Development
-        may be done in all branches, so do not trust.
+4:  Q:  Which version to choose?
+    A:  The releases are quite tested and stable. Other branches contain
+        improvements and new features, but are not stable or at least not fully
+        tested. Development code might even contain compilation/semantic errors!

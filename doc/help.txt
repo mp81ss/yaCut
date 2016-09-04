@@ -2,7 +2,9 @@
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
-C99 or newer is recommended, older standards may not work.
+C99 or newer is recommended, older standards may work not work.
+The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. It is the standard
+way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
 code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
@@ -29,8 +31,7 @@ Defining this macro remove log support. If you don't need log, you can have
 smaller executable.
 
 YCT_OPT_DISABLE_TIMING
-Defining this macro remove time measurement support. If you don't need time,
-you can have smaller executable.
+Defining this macro remove time measurement support and display on dumps.
 
 YCT_OPT_ENABLE_PARALLEL
 Define this macro to enable parallel tests execution.
@@ -54,10 +55,11 @@ SECTION: General
 YCT_GET_NAME();
 Returns a string literal representing the name of the library.
 
-YCT_GET_VERSION_MAJOR();
+YCT_VERSION_MAJOR();
 Returns an integer representing the major version of the library.
+Present in ALL versions of yaCut, use this macro to detect yaCut presence.
 
-YCT_GET_VERSION_MINOR();
+YCT_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
 YCT_SET_OUTPUT(handle);
@@ -73,6 +75,10 @@ the current context. For advanced users.
 YCT_GET_RETURN_VALUE(status);
 Return an integer according to current context.
 The var status will be 0 if all ok, 1 if some warning, 2 on assertions failure.
+
+YCT_LAST_FAILED();
+Return non-zero if last test/suite fails, zero otherwise. It is updated at the
+end of every test/suite.
 
 YCT_DUMP_SHORT();
 Print something like "all ok" or "some warning" or "some failure".
@@ -165,12 +171,15 @@ DISABLE_YCT_TEST(test);
 The defined test will not execute, when inside a suite or when explicitly
 called by YCT_TEST_RUN macro.
 
-DISABLE_YCT_SUITE(suite);
+DISABLE_YCT_SUITE(suite, f_setup, f_teardown);
 The defined suite will not execute when called by YCT_SUITE_RUN macro.
 
 NO_YCT_TEST_RUN(test)
 The passed test will NOT execute. The test can be declared normally or
 with the now redundant DISABLE_YCT_TEST macro. It is simply ignored.
+
+NO_YCT_TEST_ADD(test)
+The passed test won't run in the suite.
 
 NO_YCT_SUITE_RUN(suite)
 The passed suite will NOT execute. The suite can be declared normally or
@@ -216,7 +225,7 @@ fail.
 ATTENTION: This call has NO EFFECT if context is already locked!
 
 YCT_IS_LOCKED();
-Returns NON-ZERO if the current context is locked (a failure occurred and some
+Returns non-zero if the current context is locked (a failure occurred and some
 blocking mode was set). Otherwise returns 0.
 
 
@@ -227,8 +236,9 @@ SECTION: Log
 The logging facility of yaCut is quite simple, but is very useful for example
 when the test app crashes and you don't know where. Enabling log just means that
 BEFORE a test/assertions is performed, its file, line and test code are printed
-with a "LOG" prefix.
-See code example ex_???.c
+with a "LOG" prefix. Note that these macros can be safely left in the code even
+if the macro YCT_OPT_DISABLE_LOG is set, they are simply ignored.
+See code example ex_skip.c
 
 YCT_ENABLE_LOG();
 Enable logging. Next assertions will print their positions and tested code
@@ -274,9 +284,10 @@ YCT_PARALLEL() { ... }
 Define a parallel tests context. All tests added with YCT_PARALLEL_TEST() will
 run in parallel.
 
-YCT_PARALLEL_TEST(test)
-Run test in parallel with other tests added with this macro.
-Please note that the semicolon here is FORBIDDEN.
+Since yaCut must use OpenMP macros in its macros, things get a little bit
+complicated. We have to declare 4 macros for each parallel test to execute
+in exact order. These macros have dummy name, just add code. The simplese way
+to explain them is through an example.
 
 
 -----------------------------------------------------------------------------
@@ -308,16 +319,18 @@ YCT_ASSERT(condition);
 Abort current test if condition fails.
 
 YCT_ASSERT_MSG(condition, message);
-Abort current test and write message if condition fails.
+Abort current test and write message if condition fails. All assertions below
+have the_MSG version too, like this. Just add _MSG to macro name and add the
+message as last parameter.
 
-YCT_ASSERT_EQUAL(a, b);
-Abort current test if a != b. Do NOT use with strings/array/objects (structs).
-Technically this assertion can be used with pointers since they are elementary
-types, but keep in mind that this will compare pointers only, NOT the pointed
-data!
+YCT_ASSERT_EQUAL(expected, actual);
+Abort current test if expected != actual. Do NOT use with strings, arrays,
+objects/structs. Technically this assertion can be used with pointers since they
+are elementary types, but keep in mind that this will compare pointers only,
+NOT the pointed data!
 
-YCT_ASSERT_NOT_EQUAL(a, b);
-Abort current test if a == b. See notes above.
+YCT_ASSERT_NOT_EQUAL(expected, actual);
+Abort current test if expected == actual. See notes above.
 
 YCT_ASSERT_NULL(ptr);
 Abort current test if ptr is not NULL.
