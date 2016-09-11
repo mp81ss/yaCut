@@ -648,14 +648,14 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }
 
 #define VNUT_YCT_COMPARE_ARRAY(arr1, arr2, len, out) \
-    for (out = 0; out < (unsigned int)len && arr1[out] == arr2[out]; out++) ;
+    for (out = 0; out < (unsigned int)(len) && arr1[out] == arr2[out]; out++) ;
 
 #define YCT_ASSERT_EQUAL_ARRAY(arr1, arr2, len)                              \
     VNUT_YCT_IF_OK {                                                         \
         unsigned int yct_out_;                                               \
         p_yct_ctx_->checks++;                                                \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);               \
-        if (yct_out_ < (unsigned int)len) {                                  \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_);             \
+        if (yct_out_ < (unsigned int)(len)) {                                \
             VNUT_YCT_PRINT("FAILED", #arr1 " == " #arr2);                    \
             if (p_yct_ctx_->out != NULL) {                                   \
                 (void)fprintf(p_yct_ctx_->out,                               \
@@ -671,8 +671,8 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                                                         \
         unsigned int yct_out_;                                               \
         p_yct_ctx_->checks++;                                                \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);               \
-        if (yct_out_ < (unsigned int)len) {                                  \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_);             \
+        if (yct_out_ < (unsigned int)(len)) {                                \
             VNUT_YCT_PRINT("FAILED", #arr1 " == " #arr2);                    \
             if (p_yct_ctx_->out != NULL) {                                   \
                 (void)fprintf(p_yct_ctx_->out,                               \
@@ -686,27 +686,27 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                                                    \
     }
 
-#define YCT_ASSERT_NOT_EQUAL_ARRAY(arr1, arr2, len)            \
-    VNUT_YCT_IF_OK {                                           \
-        unsigned int yct_out_;                                 \
-        p_yct_ctx_->checks++;                                  \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_); \
-        if (yct_out_ == (unsigned int)len) {                   \
-            VNUT_YCT_PRINT("FAILED", #arr1 " != " #arr2);      \
-            if (p_yct_ctx_->out != NULL)                       \
-                VNUT_YCT_FPUTC('\n');                          \
-            p_yct_ctx_->failed = 1;                            \
-            VNUT_YCT_IF_SET_BLOCKED();                         \
-            VNUT_YCT_RETURN();                                 \
-        }                                                      \
+#define YCT_ASSERT_NOT_EQUAL_ARRAY(arr1, arr2, len)              \
+    VNUT_YCT_IF_OK {                                             \
+        unsigned int yct_out_;                                   \
+        p_yct_ctx_->checks++;                                    \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_); \
+        if (yct_out_ == (unsigned int)(len)) {                   \
+            VNUT_YCT_PRINT("FAILED", #arr1 " != " #arr2);        \
+            if (p_yct_ctx_->out != NULL)                         \
+                VNUT_YCT_FPUTC('\n');                            \
+            p_yct_ctx_->failed = 1;                              \
+            VNUT_YCT_IF_SET_BLOCKED();                           \
+            VNUT_YCT_RETURN();                                   \
+        }                                                        \
     }
 
 #define YCT_ASSERT_NOT_EQUAL_ARRAY_MSG(arr1, arr2, len, msg)       \
     VNUT_YCT_IF_OK {                                               \
         unsigned int yct_out_;                                     \
         p_yct_ctx_->checks++;                                      \
-        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), len, yct_out_);     \
-        if (yct_out_ == (unsigned int)len) {                       \
+        VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), yct_out_);   \
+        if (yct_out_ == (unsigned int)(len)) {                     \
             VNUT_YCT_PRINT_MSG("FAILED", #arr1 " != " #arr2, msg); \
             p_yct_ctx_->failed = 1;                                \
             VNUT_YCT_IF_SET_BLOCKED();                             \

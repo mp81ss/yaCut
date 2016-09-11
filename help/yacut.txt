@@ -3,6 +3,8 @@
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
 C99 or newer is recommended, older standards may work.
+The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. It is the standard
+way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
 code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
@@ -39,10 +41,10 @@ SECTION: General
 YCT_GET_NAME();
 Returns a string literal representing the name of the library.
 
-YCT_GET_VERSION_MAJOR();
+YCT_VERSION_MAJOR();
 Returns an integer representing the major version of the library.
 
-YCT_GET_VERSION_MINOR();
+YCT_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
 YCT_SET_OUTPUT(handle);
@@ -147,13 +149,16 @@ called by YCT_TEST_RUN macro.
 DISABLE_YCT_SUITE(suite);
 The defined suite will not execute when called by YCT_SUITE_RUN macro.
 
-NO_YCT_TEST_RUN(test)
+NO_YCT_TEST_RUN(test);
 The passed test will NOT execute. The test can be declared normally or
 with the now redundant DISABLE_YCT_TEST macro. It is simply ignored.
 
-NO_YCT_SUITE_RUN(suite)
+NO_YCT_SUITE_RUN(suite);
 The passed suite will NOT execute. The suite can be declared normally or
 with the now redundant DISABLE_YCT_SUITE macro. It is simply ignored.
+
+NO_YCT_TEST_ADD(test);
+The passed test won't be added to current suite.
 
 YCT_DISABLE();
 All following warnings, assertions, tests and suites will NOT execute.
