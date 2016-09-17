@@ -63,7 +63,7 @@ YCT_SUITE_END
 To run the suite:
 
 YCT_BEGIN("");
-YCT_SUITE_RUN(test);
+YCT_SUITE_RUN(suite);
 /* add your suites/tests here */
 
 YCT_DUMP_SHORT();

@@ -14,6 +14,16 @@
          (Broken compatibility with version 1.x, so changed major version)
 
 
+1.0.3 (17 Sep 2016)
+
+    FIX: Documentation fix
+
+
+1.0.2 (11 Sep 2016)
+
+    FIX: Documentation fix and minor code improvements
+
+
 1.0.1 (03 Sep 2016)
 
     FIX: Error on managing failed total and documentation fix
