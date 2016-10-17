@@ -146,9 +146,9 @@ struct yct_context {
 #define YCT_DISABLE_TIMING() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)
 #define VNUT_YCT_GET_START_TIME() yct_main_ctx_.clocks = clock()
-#define VNUT_YCT_PRINT_ELAPSED_TIME()                                       \
-    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING) \
-        == 0) { fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double)      \
+#define VNUT_YCT_PRINT_ELAPSED_TIME()                                        \
+    if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)  \
+        == 0) { (void)fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double) \
                 (clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC); }
 #endif
 
