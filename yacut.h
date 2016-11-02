@@ -174,15 +174,13 @@ struct yct_context {
 #endif
 
 // General
-#define YCT_BEGIN(name) {                                             \
-    struct yct_context yct_main_ctx_;                                 \
-    struct yct_context* const p_yct_ctx_ = &yct_main_ctx_;            \
-    VNUT_YCT_INIT_DATA(yct_main_ctx_);                                \
-    yct_main_ctx_.out = YCT_DEFAULT_OUTPUT;                           \
-    if ((name) != NULL && *(name) != 0) {                             \
-        if (*(name) != '\"') yct_main_ctx_.msg = (const char*)(name); \
-        else yct_main_ctx_.msg = #name;                               \
-    } else p_yct_ctx_->msg = ""; VNUT_YCT_GET_START_TIME();
+#define YCT_BEGIN(name) {                                  \
+    struct yct_context yct_main_ctx_;                      \
+    struct yct_context* const p_yct_ctx_ = &yct_main_ctx_; \
+    VNUT_YCT_INIT_DATA(yct_main_ctx_);                     \
+    yct_main_ctx_.out = YCT_DEFAULT_OUTPUT;                \
+    yct_main_ctx_.msg = (const char*)(name);               \
+    VNUT_YCT_GET_START_TIME();
 
 #define YCT_TEST(test_name) \
     static void test_name(struct yct_context* const p_yct_ctx_)
@@ -286,7 +284,7 @@ struct yct_context {
         p_yct_ctx_->messages += yct_ctx_.messages;           \
     }
 
-#define YCT_END() (void)yct_main_ctx_; }
+#define YCT_END() }
 
 #define YCT_MAIN(epf) int main(void) { YCT_BEGIN(""); epf(&yct_main_ctx_); \
     if (VNUT_YCT_GET_BIT(yct_main_ctx_.flags, VNUT_YCT_FLAGS_IS_SUITE))    \
@@ -337,9 +335,8 @@ struct yct_context {
 
 #define VNUT_YCT_FPUTC(c) ((void)fputc((c), p_yct_ctx_->out))
 #define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, str))
-#define VNUT_YCT_PRINT_STR(str)                                           \
-    do { if (*(str) == '\"') (void)fputs((void*)(#str), p_yct_ctx_->out); \
-         else (void)fputs((void*)(str), p_yct_ctx_->out); } while (0)
+#define VNUT_YCT_PRINT_STR(str) \
+    do { (void)fputs((void*)(str), p_yct_ctx_->out); } while (0)
 
 #define YCT_DUMP_SHORT()                                         \
     if (yct_main_ctx_.out != NULL) {                             \
@@ -359,7 +356,8 @@ struct yct_context {
 
 #define YCT_DUMP()                                                           \
 if (p_yct_ctx_->out != NULL) {                                               \
-    const int yct_has_label_ = *p_yct_ctx_->msg != 0;                        \
+    const char* yct_title = p_yct_ctx_->msg;                                 \
+    const int yct_has_label_ = yct_title != NULL && *yct_title != '\0';      \
     const int tests = p_yct_ctx_->tests > 0 ? p_yct_ctx_->tests : 1;         \
     (void)fprintf(p_yct_ctx_->out, "\n------ %s v%d.%d Summary -----"        \
     "%s%s\nTests:      %d\nPassed:     %d\nFailed:     %d\nSuites:     %d\n" \
@@ -436,14 +434,14 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                       \
 } while (0)
 
-#define VNUT_YCT_PRINT_MSG(main_msg, cond, msg) do { \
-    VNUT_YCT_PRINT(main_msg, cond);                  \
-    if (p_yct_ctx_->out != NULL) {                   \
-        VNUT_YCT_FPUTS(" { \"");                     \
-        VNUT_YCT_PRINT_STR(msg);                     \
-        VNUT_YCT_FPUTS("\" }\n");                    \
-    }                                                \
-} while (0)
+#define VNUT_YCT_PRINT_MSG(main_msg, cond, msg) \
+    do { VNUT_YCT_PRINT(main_msg, cond);        \
+        if (p_yct_ctx_->out != NULL) {          \
+            VNUT_YCT_FPUTS(" { \"");            \
+            VNUT_YCT_PRINT_STR(msg);            \
+            VNUT_YCT_FPUTS("\" }\n");           \
+        }                                       \
+    } while (0)
 
 #ifdef YCT_OPT_DISABLE_LOG
 #define VNUT_YCT_LOG(cond)
