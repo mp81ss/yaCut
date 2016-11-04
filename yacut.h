@@ -13,16 +13,16 @@
 #include <stdio.h>
 
 #ifndef YCT_FUNC_NAME
-#ifdef __GNUC__
-#define YCT_FUNC_NAME __PRETTY_FUNCTION__
-#elif (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
+#if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
 #define YCT_FUNC_NAME __FUNCTION__
-#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+#elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x550))
 #define YCT_FUNC_NAME __FUNC__
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+#elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
 #define YCT_FUNC_NAME __func__
+#elif defined(__GNUC__)
+#define YCT_FUNC_NAME __PRETTY_FUNCTION__
 #else
-#define YCT_FUNC_NAME "unknown"
+#define YCT_FUNC_NAME "YCT_TEST"
 #endif
 #endif
 
@@ -125,8 +125,7 @@ struct yct_context {
     if ((name) != NULL && *(name) != 0) {                             \
         if (*(name) != '\"') yct_main_ctx_.msg = (const char*)(name); \
         else yct_main_ctx_.msg = #name;                               \
-    }                                                                 \
-    else p_yct_ctx_->msg = "";
+    } else p_yct_ctx_->msg = ""; VNUT_YCT_GET_START_TIME();
 
 #define YCT_TEST(test_name) \
     static void test_name(struct yct_context* const p_yct_ctx_)
@@ -303,6 +302,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
         default: break;                                                     \
     }                                                                       \
 }
+
 #endif
 
 #define VNUT_YCT_PRINT_MAIN(main_msg)                       \
@@ -408,7 +408,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
         p_yct_ctx_->checks++;                         \
         if (!(cond)) {                                \
             VNUT_YCT_PRINT_MSG("FAILED", #cond, msg); \
-            p_yct_ctx_->failed =1;                    \
+            p_yct_ctx_->failed = 1;                   \
             VNUT_YCT_IF_SET_BLOCKED();                \
             VNUT_YCT_RETURN();                        \
         }                                             \
@@ -424,8 +424,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_PRINT_VAR(expected);                   \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
                 VNUT_YCT_PRINT_VAR(actual);                     \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTC('\n');                           \
+                VNUT_YCT_FPUTS(">\n");                          \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
             VNUT_YCT_IF_SET_BLOCKED();                          \
@@ -443,8 +442,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_PRINT_VAR(expected);                   \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
                 VNUT_YCT_PRINT_VAR(actual);                     \
-                VNUT_YCT_FPUTC('>');                            \
-                VNUT_YCT_FPUTS(" { \"");                        \
+                VNUT_YCT_FPUTS("> { \"");                       \
                 VNUT_YCT_PRINT_STR(msg);                        \
                 VNUT_YCT_FPUTS("\" }\n");                       \
             }                                                   \
