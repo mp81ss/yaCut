@@ -249,7 +249,8 @@ struct yct_context {
 
 #define YCT_DUMP()                                                           \
 if (p_yct_ctx_->out != NULL) {                                               \
-    const int yct_has_label_ = *p_yct_ctx_->msg != 0;                        \
+    const char* yct_title = p_yct_ctx_->msg;                                 \
+    const int yct_has_label_ = yct_title != NULL && *yct_title != '\0';      \
     const int tests = p_yct_ctx_->tests > 0 ? p_yct_ctx_->tests : 1;         \
     (void)fprintf(p_yct_ctx_->out, "\n------ %s v%d.%d Summary -----"        \
     "%s%s\nTests:      %d\nPassed:     %d\nFailed:     %d\nSuites:     %d\n" \
