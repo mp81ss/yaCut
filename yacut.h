@@ -673,7 +673,6 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_IF_OK {                        \
         p_yct_ctx_->checks++;               \
         VNUT_YCT_LOG(var != NULL);          \
-        VNUT_YCT_LOG(var);                  \
         if ((var) == NULL) {                \
             VNUT_YCT_PRINT_MAIN("FAILED");  \
             if (p_yct_ctx_->out != NULL) {  \
