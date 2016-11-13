@@ -8,7 +8,9 @@
     ADD: Preprocessor message for each yaCut option (YCT_OPT_...) specified
     ADD: Several utilities macro (see file help.txt)
     CHG: Naming convention of input options (now all begin with YCT_OPT_...)
-         (Broken compatibility with version 1.x, so changed major version)
+         Broken compatibility:
+         Versions up to v1.0.3 use the old name. Next versions and all
+         versions 2.x use the new convention, so changed major version)
     CHG: Esthetic of internal code
     DEL: YCT_GET_DATA
          (Broken compatibility with version 1.x, so changed major version)

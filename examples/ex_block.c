@@ -6,7 +6,7 @@
    context.
  */
 
-static int x = 0;
+volatile int x = 0;
 
 
 YCT_TEST(test_set_x_to_1_and_fail)

@@ -1,13 +1,13 @@
 1:  Q:  gcc -ansi gives errors. Why?
-    A:  yaCut relies on C99. Replace -ansi with -std=c99. Ladsoft compilers
-        requires /9, etc.
+    A:  yaCut relies on C99. Replace -ansi with -std=c99 (or equivalent switch
+        in your compiler).
 
 2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appear.
         Why?
     A:  Try defining YCT_OPT_DISABLE_INT64. If still not resolved, look at
         YCT_FUNC_NAME macro.
 
-    2a: Q: In MS-DOS, cannot link. Why?
+    2q: Q: In MS-DOS, cannot link. Why?
     2a: A: Allow more segments for code (medium or large memory model).
 
 3:  Q:  I can compile/link, but generated executable is very big. Why?
@@ -19,6 +19,6 @@
         Splitting your code in several smaller files may help.
 
 4:  Q:  Which version to choose?
-    A:  The releases are quite tested and stable. Other branches contain
-        improvements and new features, but are not stable or at least not fully
-        tested. Development code might even contain compilation/semantic errors!
+    A:  Release packages are quite tested and stable. Branches contain bugfix,
+        improvements and new features, but may not be stable, not fully tested
+        or may even fail to compile.

@@ -28,7 +28,7 @@ YCT_TEST(test_teardown)
 }
 
 /* Note that NULL can be passed for setup/teardown if not needed. */
-YCT_SUITE(suite, &setup, &teardown)
+YCT_SUITE(suite, setup, teardown)
 {
     /* suite_setup(); Any defined function as suite setup. */
 

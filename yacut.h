@@ -185,17 +185,20 @@ struct yct_context {
 #define YCT_TEST(test_name) \
     static void test_name(struct yct_context* const p_yct_ctx_)
 
-#define DISABLE_YCT_TEST(test_name) YCT_TEST(test_name) \
-    { (void)p_yct_ctx_; return; }                       \
+#define DISABLE_YCT_TEST(test_name) YCT_TEST(test_name) {  \
+    if (p_yct_ctx_->checks == p_yct_ctx_->flags)           \
+        p_yct_ctx_->checks = p_yct_ctx_->flags; return; }  \
     void test_name##_YCT_DISABLED_TEST_(struct yct_context* const p_yct_ctx_)
 
 #define YCT_SUITE(suite_name, setup, teardown)                     \
     static void suite_name(struct yct_context* const p_yct_ctx_) { \
-        void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
+        void (*f_setup_)(void) = setup;                            \
+        void (*f_tear_down_)(void) = teardown;                     \
+        if (f_setup_ == f_tear_down_)                              \
+            VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_IS_SUITE);
 
-#define YCT_SUITE_END                                             \
-    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_IS_SUITE); \
-    (void)f_setup_; (void)f_tear_down_; return; }
+#define YCT_SUITE_END \
+    VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_IS_SUITE); return; }
 
 #define DISABLE_YCT_SUITE(suite_name, setup, teardown)                      \
     YCT_SUITE(suite_name, setup, teardown) YCT_SUITE_END                    \
@@ -255,33 +258,33 @@ struct yct_context {
         }                                                                    \
     }
 
-#define NO_YCT_TEST_ADD(test_name) (void)(test_name)
+#define NO_YCT_TEST_ADD(test_name)
 
 #define NO_YCT_SUITE_RUN(suite_name) (void)(suite_name)
 
-#define YCT_SUITE_RUN(yct_name)                              \
-    VNUT_YCT_IF_OK {                                         \
-        struct yct_context yct_ctx_;                         \
-        VNUT_YCT_INIT_DATA(yct_ctx_);                        \
-        yct_ctx_.out = p_yct_ctx_->out;                      \
-        VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                \
-                           VNUT_YCT_FLAGS_LAST_FAILED);      \
-        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags, \
-            VNUT_YCT_FLAGS_BLOCKING_MODE                     \
-            | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE              \
-            | VNUT_YCT_FLAGS_LOG);                           \
-        yct_name(&yct_ctx_);                                 \
-        VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags, \
-                      VNUT_YCT_FLAGS_LOCKED);                \
-        if (yct_ctx_.failed > 0) {                           \
-            VNUT_YCT_SET_BIT(p_yct_ctx_->flags,              \
-                             VNUT_YCT_FLAGS_LAST_FAILED); }  \
-        p_yct_ctx_->suites++;                                \
-        p_yct_ctx_->tests += yct_ctx_.tests;                 \
-        p_yct_ctx_->failed += yct_ctx_.failed;               \
-        p_yct_ctx_->warnings += yct_ctx_.warnings;           \
-        p_yct_ctx_->checks += yct_ctx_.checks;               \
-        p_yct_ctx_->messages += yct_ctx_.messages;           \
+#define YCT_SUITE_RUN(yct_name)                               \
+    VNUT_YCT_IF_OK {                                          \
+        struct yct_context yct_ctx_;                          \
+        VNUT_YCT_INIT_DATA(yct_ctx_);                         \
+        yct_ctx_.out = p_yct_ctx_->out;                       \
+        VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                 \
+                           VNUT_YCT_FLAGS_LAST_FAILED);       \
+        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,  \
+                          VNUT_YCT_FLAGS_BLOCKING_MODE        \
+                          | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE \
+                          | VNUT_YCT_FLAGS_LOG);              \
+        yct_name(&yct_ctx_);                                  \
+        VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,  \
+                          VNUT_YCT_FLAGS_LOCKED);             \
+        if (yct_ctx_.failed > 0) {                            \
+            VNUT_YCT_SET_BIT(p_yct_ctx_->flags,               \
+                             VNUT_YCT_FLAGS_LAST_FAILED); }   \
+        p_yct_ctx_->suites++;                                 \
+        p_yct_ctx_->tests += yct_ctx_.tests;                  \
+        p_yct_ctx_->failed += yct_ctx_.failed;                \
+        p_yct_ctx_->warnings += yct_ctx_.warnings;            \
+        p_yct_ctx_->checks += yct_ctx_.checks;                \
+        p_yct_ctx_->messages += yct_ctx_.messages;            \
     }
 
 #define YCT_END() }
@@ -386,8 +389,8 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define VNUT_YCT_PRINT_VAR(var) do {                                     \
     const size_t yct_pv_len_ = sizeof(var);                              \
     switch(yct_pv_len_) {                                                \
-        case 1: (void)fprintf(p_yct_ctx_->out, "%c", (char)var); break;  \
-        case 2: (void)fprintf(p_yct_ctx_->out, "%d", (int)var); break;   \
+        case 1: (void)fprintf(p_yct_ctx_->out, "%c",  (char)var); break; \
+        case 2: (void)fprintf(p_yct_ctx_->out, "%d",  (int) var); break; \
         case 4: (void)fprintf(p_yct_ctx_->out, "%ld", (long)var); break; \
         default: break;                                                  \
     }                                                                    \
@@ -404,9 +407,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define VNUT_YCT_PRINT_VAR(var) do {                                        \
     const size_t yct_pv_len_ = sizeof(var);                                 \
     switch(yct_pv_len_) {                                                   \
-        case 1: (void)fprintf(p_yct_ctx_->out, "%c", (char)var); break;     \
+        case 1: (void)fprintf(p_yct_ctx_->out, "%c",  (char) var); break;   \
         case 2: (void)fprintf(p_yct_ctx_->out, "%hd", (short)var); break;   \
-        case 4: (void)fprintf(p_yct_ctx_->out, "%d", (int)var); break;      \
+        case 4: (void)fprintf(p_yct_ctx_->out, "%d",  (int)  var); break;   \
         case 8: (void)fprintf(p_yct_ctx_->out, "%I64d",                     \
                                                (VNUT_YCT_INT64)var); break; \
         default: break;                                                     \
@@ -689,13 +692,12 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                   \
     }
 
-#define VNUT_YCT_COMPARE_STR(str1, str2, out) {                           \
+#define VNUT_YCT_COMPARE_STR(str1, str2, out) do {                        \
     unsigned int yct_i_; out = 0;                                         \
     for (yct_i_ = 0; str1[yct_i_] != 0 && str1[yct_i_] == str2[yct_i_];   \
-         yct_i_++) ;                                                      \
+         yct_i_++) { }                                                    \
     out = (int)((unsigned int)str1[yct_i_] - (unsigned int)str2[yct_i_]); \
-}
-
+} while (0)
 
 #define YCT_ASSERT_EQUAL_STR(expected, actual)                  \
     VNUT_YCT_IF_OK {                                            \
