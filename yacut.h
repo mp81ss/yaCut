@@ -70,7 +70,7 @@ struct yct_context {
 #define VNUT_YCT_GET_BIT(var, mask) ((var) & (mask))
 #define VNUT_YCT_CLEAR_BIT(var, mask) ((var) &= ~(mask))
 #define VNUT_YCT_SET_BIT(var, mask) do { VNUT_YCT_CLEAR_BIT((var), (mask)); \
-        (var) |= (mask); } while (0)
+                                         (var) |= (mask); } while (0)
 #define VNUT_YCT_COPY_BIT(src, dest, mask) \
     VNUT_YCT_SET_BIT((dest), VNUT_YCT_GET_BIT((src), (mask)));
 
@@ -434,14 +434,14 @@ if (p_yct_ctx_->out != NULL) {                                               \
     }                                       \
 } while (0)
 
-#define VNUT_YCT_PRINT_MSG(main_msg, cond, msg) \
-    do { VNUT_YCT_PRINT(main_msg, cond);        \
-        if (p_yct_ctx_->out != NULL) {          \
-            VNUT_YCT_FPUTS(" { \"");            \
-            VNUT_YCT_PRINT_STR(msg);            \
-            VNUT_YCT_FPUTS("\" }\n");           \
-        }                                       \
-    } while (0)
+#define VNUT_YCT_PRINT_MSG(main_msg, cond, msg) do { \
+    VNUT_YCT_PRINT(main_msg, cond);                  \
+    if (p_yct_ctx_->out != NULL) {                   \
+        VNUT_YCT_FPUTS(" { \"");                     \
+        VNUT_YCT_PRINT_STR(msg);                     \
+        VNUT_YCT_FPUTS("\" }\n");                    \
+    }                                                \
+} while (0)
 
 #ifdef YCT_OPT_DISABLE_LOG
 #define VNUT_YCT_LOG(cond)
