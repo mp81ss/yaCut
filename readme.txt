@@ -18,7 +18,9 @@ Yet Another C "Unit" Test framework
 - Free (BSD-license, see file LICENSE for details)
 
 
-WARNING: Download a release package, branches may be unstable.
+## WARNING:
+
+Download a release package, branches may be unstable.
 
 
 To declare a test:

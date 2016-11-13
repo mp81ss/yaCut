@@ -274,13 +274,16 @@ if (p_yct_ctx_->out != NULL) {                                               \
 }
 
 /* Internal prints */
+#if ( (defined YCT_DISABLE_INT64) || (defined YCT_OPT_DISABLE_INT64) )
 #ifdef YCT_DISABLE_INT64
+#pragma message("yaCut: Using old and deprecated parameter YCT_DISABLE_INT64")
+#endif
 
 #define VNUT_YCT_PRINT_VAR(var) do {                                     \
     const size_t yct_pv_len_ = sizeof(var);                              \
     switch(yct_pv_len_) {                                                \
-        case 1: (void)fprintf(p_yct_ctx_->out, "%c", (char)var); break;  \
-        case 2: (void)fprintf(p_yct_ctx_->out, "%d", (int)var); break;   \
+        case 1: (void)fprintf(p_yct_ctx_->out, "%c",  (char)var); break; \
+        case 2: (void)fprintf(p_yct_ctx_->out, "%d",  (int) var); break; \
         case 4: (void)fprintf(p_yct_ctx_->out, "%ld", (long)var); break; \
         default: break;                                                  \
     }                                                                    \
@@ -297,9 +300,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
 #define VNUT_YCT_PRINT_VAR(var) do {                                        \
     const size_t yct_pv_len_ = sizeof(var);                                 \
     switch(yct_pv_len_) {                                                   \
-        case 1: (void)fprintf(p_yct_ctx_->out, "%c", (char)var); break;     \
+        case 1: (void)fprintf(p_yct_ctx_->out, "%c",  (char) var); break;   \
         case 2: (void)fprintf(p_yct_ctx_->out, "%hd", (short)var); break;   \
-        case 4: (void)fprintf(p_yct_ctx_->out, "%d", (int)var); break;      \
+        case 4: (void)fprintf(p_yct_ctx_->out, "%d",  (int)  var); break;   \
         case 8: (void)fprintf(p_yct_ctx_->out, "%I64d",                     \
                                                (VNUT_YCT_INT64)var); break; \
         default: break;                                                     \
@@ -558,13 +561,12 @@ if (p_yct_ctx_->out != NULL) {                                               \
         }                                   \
     }
 
-#define VNUT_YCT_COMPARE_STR(str1, str2, out) {                           \
+#define VNUT_YCT_COMPARE_STR(str1, str2, out) do {                        \
     unsigned int yct_i_; out = 0;                                         \
     for (yct_i_ = 0; str1[yct_i_] != 0 && str1[yct_i_] == str2[yct_i_];   \
-         yct_i_++) ;                                                      \
+         yct_i_++) { }                                                    \
     out = (int)((unsigned int)str1[yct_i_] - (unsigned int)str2[yct_i_]); \
-}
-
+} while (0)
 
 #define YCT_ASSERT_EQUAL_STR(expected, actual)                  \
     VNUT_YCT_IF_OK {                                            \
