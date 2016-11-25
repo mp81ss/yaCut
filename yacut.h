@@ -460,7 +460,6 @@ if (p_yct_ctx_->out != NULL) {                                               \
 // Messages, Warnings, Assertions
 #define YCT_MESSAGE(msg) do {       \
     p_yct_ctx_->messages++;         \
-    VNUT_YCT_LOG(msg);              \
     VNUT_YCT_PRINT_MAIN("MESSAGE"); \
     if (p_yct_ctx_->out != NULL) {  \
         VNUT_YCT_FPUTS("{ \"");     \
