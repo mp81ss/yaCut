@@ -1,6 +1,5 @@
 2.0 (Not yest released, currently under testing)
 
-    FIX: Number of failed tests (fixed in v1.0.1 too)
     FIX: Minor bugs on array functions
     ADD: Log support
     ADD: Timing support

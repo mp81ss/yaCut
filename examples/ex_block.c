@@ -76,6 +76,7 @@ static void show_full_blocking(void)
     assert(x == 2);
 
     YCT_DUMP();
+    YCT_DISABLE_TIMING(); /* This avoid printing elapsed time */
     YCT_DUMP_SHORT();
 
     YCT_END();

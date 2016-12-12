@@ -80,14 +80,6 @@ struct yct_context {
 
 #define YCT_SET_OUTPUT(handle) (yct_main_ctx_.out = (handle))
 
-#define YCT_CURRENT_CONTEXT() (*p_yct_ctx_)
-
-#define YCT_MERGE_CONTEXT(ctx_dst, ctx_src) do {                            \
-    ctx_dst.suites += ctx_src.suites; ctx_dst.messages += ctx_src.messages; \
-    ctx_dst.tests += ctx_src.tests; ctx_dst.checks += ctx_src.checks;       \
-    ctx_dst.warnings += ctx_src.warnings; ctx_dst.failed += ctx_src.failed; \
-} while (0)
-
 #define YCT_GET_RETURN_VALUE(val) do { \
     if (p_yct_ctx_->failed > 0)        \
         val = 2;                       \
@@ -178,7 +170,7 @@ struct yct_context {
     struct yct_context yct_main_ctx_;                      \
     struct yct_context* const p_yct_ctx_ = &yct_main_ctx_; \
     VNUT_YCT_INIT_DATA(yct_main_ctx_);                     \
-    yct_main_ctx_.out = YCT_DEFAULT_OUTPUT;                \
+    YCT_SET_OUTPUT(YCT_DEFAULT_OUTPUT);                    \
     yct_main_ctx_.msg = (const char*)(name);               \
     VNUT_YCT_GET_START_TIME();
 
@@ -206,6 +198,19 @@ struct yct_context {
     test_name##_YCT_DISABLED_SUITE_(struct yct_context* const p_yct_ctx_) { \
         void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
 
+#define VNUT_YCT_FPUTC(c) ((void)fputc((c), p_yct_ctx_->out))
+#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, str))
+#define VNUT_YCT_PRINT_STR(str) \
+    do { (void)fputs((void*)(str), p_yct_ctx_->out); } while (0)
+
+#define VNUT_YCT_PRINT_TEST(name) if (yct_ctx_.out != NULL) {       \
+    VNUT_YCT_PRINT_STR("Executing test:  "); VNUT_YCT_FPUTS(#name); \
+    VNUT_YCT_FPUTC('\n'); }
+
+#define VNUT_YCT_PRINT_END_NAME()                                           \
+if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
+    && yct_ctx_.out != NULL) VNUT_YCT_FPUTC('\n');
+
 #define YCT_TEST_RUN(test_name)                                              \
     VNUT_YCT_IF_OK {                                                         \
         struct yct_context yct_ctx_;                                         \
@@ -216,6 +221,7 @@ struct yct_context {
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
+        VNUT_YCT_PRINT_TEST(test_name);                                      \
         test_name(&yct_ctx_);                                                \
         p_yct_ctx_->tests++;                                                 \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                           \
@@ -227,11 +233,12 @@ struct yct_context {
             p_yct_ctx_->failed++;                                            \
             VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED); \
         }                                                                    \
+        VNUT_YCT_PRINT_END_NAME();                                           \
     }
 
 #define NO_YCT_TEST_RUN(test_name) (void)(test_name)
 
-#define YCT_TEST_ADD(yct_name)                                               \
+#define YCT_TEST_ADD(test_name)                                              \
     VNUT_YCT_IF_OK {                                                         \
         struct yct_context yct_ctx_;                                         \
         VNUT_YCT_INIT_DATA(yct_ctx_);                                        \
@@ -241,9 +248,10 @@ struct yct_context {
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
+        VNUT_YCT_PRINT_TEST(test_name);                                      \
         if (f_setup_ != NULL)                                                \
             (*f_setup_)();                                                   \
-        yct_name(&yct_ctx_);                                                 \
+        test_name(&yct_ctx_);                                                \
         if (f_tear_down_ != NULL)                                            \
             (*f_tear_down_)();                                               \
         p_yct_ctx_->tests++;                                                 \
@@ -256,35 +264,42 @@ struct yct_context {
             p_yct_ctx_->failed++;                                            \
             VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED); \
         }                                                                    \
+        VNUT_YCT_PRINT_END_NAME();                                           \
     }
 
 #define NO_YCT_TEST_ADD(test_name)
 
 #define NO_YCT_SUITE_RUN(suite_name) (void)(suite_name)
 
-#define YCT_SUITE_RUN(yct_name)                               \
-    VNUT_YCT_IF_OK {                                          \
-        struct yct_context yct_ctx_;                          \
-        VNUT_YCT_INIT_DATA(yct_ctx_);                         \
-        yct_ctx_.out = p_yct_ctx_->out;                       \
-        VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                 \
-                           VNUT_YCT_FLAGS_LAST_FAILED);       \
-        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,  \
-                          VNUT_YCT_FLAGS_BLOCKING_MODE        \
-                          | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE \
-                          | VNUT_YCT_FLAGS_LOG);              \
-        yct_name(&yct_ctx_);                                  \
-        VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,  \
-                          VNUT_YCT_FLAGS_LOCKED);             \
-        if (yct_ctx_.failed > 0) {                            \
-            VNUT_YCT_SET_BIT(p_yct_ctx_->flags,               \
-                             VNUT_YCT_FLAGS_LAST_FAILED); }   \
-        p_yct_ctx_->suites++;                                 \
-        p_yct_ctx_->tests += yct_ctx_.tests;                  \
-        p_yct_ctx_->failed += yct_ctx_.failed;                \
-        p_yct_ctx_->warnings += yct_ctx_.warnings;            \
-        p_yct_ctx_->checks += yct_ctx_.checks;                \
-        p_yct_ctx_->messages += yct_ctx_.messages;            \
+#define YCT_SUITE_RUN(suite_name)                              \
+    VNUT_YCT_IF_OK {                                           \
+        struct yct_context yct_ctx_;                           \
+        VNUT_YCT_INIT_DATA(yct_ctx_);                          \
+        yct_ctx_.out = p_yct_ctx_->out;                        \
+        VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                  \
+                           VNUT_YCT_FLAGS_LAST_FAILED);        \
+        VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,   \
+                          VNUT_YCT_FLAGS_BLOCKING_MODE         \
+                          | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE  \
+                          | VNUT_YCT_FLAGS_LOG);               \
+        if (yct_ctx_.out != NULL) {                            \
+            VNUT_YCT_PRINT_STR("Executing suite: ");           \
+            VNUT_YCT_FPUTS(#suite_name); VNUT_YCT_FPUTC('\n'); \
+        }                                                      \
+        suite_name(&yct_ctx_);                                 \
+        VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,   \
+                          VNUT_YCT_FLAGS_LOCKED);              \
+        if (yct_ctx_.failed > 0) {                             \
+            VNUT_YCT_SET_BIT(p_yct_ctx_->flags,                \
+                             VNUT_YCT_FLAGS_LAST_FAILED);      \
+        }                                                      \
+        VNUT_YCT_PRINT_END_NAME();                             \
+        p_yct_ctx_->suites++;                                  \
+        p_yct_ctx_->tests += yct_ctx_.tests;                   \
+        p_yct_ctx_->failed += yct_ctx_.failed;                 \
+        p_yct_ctx_->warnings += yct_ctx_.warnings;             \
+        p_yct_ctx_->checks += yct_ctx_.checks;                 \
+        p_yct_ctx_->messages += yct_ctx_.messages;             \
     }
 
 #define YCT_END() }
@@ -335,11 +350,6 @@ struct yct_context {
             p_yct_ctx_->failed++;                     \
         } } } }
 #endif
-
-#define VNUT_YCT_FPUTC(c) ((void)fputc((c), p_yct_ctx_->out))
-#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, str))
-#define VNUT_YCT_PRINT_STR(str) \
-    do { (void)fputs((void*)(str), p_yct_ctx_->out); } while (0)
 
 #define YCT_DUMP_SHORT()                                         \
     if (yct_main_ctx_.out != NULL) {                             \

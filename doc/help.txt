@@ -2,7 +2,7 @@
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C99 header, just include and compile it.
-C99 or newer is recommended, older standards may work not work.
+C99 or newer is recommended, older standards may work or not.
 The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. It is the standard
 way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
@@ -64,16 +64,13 @@ Returns an integer representing the minor version of the library.
 
 YCT_SET_OUTPUT(handle);
 Set the output handle. The default is stdout. You can pass your FILE* variable.
-Handle must be already opened and writable.
-
-YCT_MERGE_CONTEXT(ctx_dest, ctx_src);
-Data stored in ctx_src is added to ctx_dest. Contexts are of type
-struct yct_context. Useful to have one dump only or more generally to have
-less context to process. You can pass the macro YCT_CURRENT_CONTEXT to use
-the current context. For advanced users.
+This macro is to be used in a main context. If you want to change the output
+handle inside another context (test/suite), you have to access the internal
+yaCut context (see how assertions write).
+Handle must be already opened and writable. It won't be closed.
 
 YCT_GET_RETURN_VALUE(status);
-Return an integer according to current context.
+Put current context failure level in passed integer variable.
 The var status will be 0 if all ok, 1 if some warning, 2 on assertions failure.
 
 YCT_LAST_FAILED();
@@ -86,9 +83,6 @@ Print something like "all ok" or "some warning" or "some failure".
 YCT_DUMP();
 Print a quite detailed summary of execution. Typically used as last directive
 before YCT_END.
-
-YCT_DISABLE_TIMING();
-Using this macro prevents yaCut to write elapsed time.
 
 
 -----------------------------------------------------------------------------
@@ -145,7 +139,8 @@ the YCT_SUITE_END macro, no return value is allowed. To be used in global
 scope.
 
 YCT_SUITE_END
-Close the suite opened by YCT_SUITE.
+Close the suite opened by YCT_SUITE. Note that no parentheses and/or semicolon
+follow. This macro must be put after the YCT_SUITE block.
 
 YCT_TEST_ADD(test);
 Add test test to current suite. To be used inside YCT_SUITE context.
@@ -165,7 +160,8 @@ context. On the other side, leaving standard declarations, you can prepend
 "NO_" to YCT_TEST_ADD/YCT_TEST_RUN/YCT_SUITE_RUN inside YCT_BEGIN/YCT_END
 or YCY_SUITE context. The 3rd way is to call YCT_DISABLE to skip all
 following tests/suites and possibly restore standard behaviour by calling
-YCT_ENABLE. See code example ex_skip.c
+YCT_ENABLE.
+See code example ex_skip.c
 
 DISABLE_YCT_TEST(test);
 The defined test will not execute, when inside a suite or when explicitly
@@ -258,10 +254,10 @@ Otherwise returns 0.
 SECTION: Timing
 The timing feature of yaCut just prints the (CPU) time of execution.
 It is enabled by default.
-See code example ex_???.c
+See code example ex_block.c
 
 YCT_DISABLE_TIMING();
-Disable timing, execution time is not printed.
+Disable time recording, execution time is not printed.
 
 
 -----------------------------------------------------------------------------
@@ -278,6 +274,11 @@ Standard suites do not support parallel tests directly. Inside a suite, you can
 add tests that call another yaCut context in which you declare parallel tests.
 To get parallel tests execution, define YCT_OPT_ENABLE_PARALLEL before including
 yaCut and remember to compile/link with OpenMP support.
+Please note that even if your fprintf implementation is thread-safe, yaCut
+messages may be printed in pseudo random order, since each report is the result
+of several calls to fprintf. You should limit as much as possible the failures
+in these tests. Finally consider to prevent reports dumping using macro
+YCT_SET_OUTPUT (with NULL parameter).
 See code example ex_paral.c
 
 YCT_PARALLEL() { ... }
@@ -286,8 +287,8 @@ run in parallel.
 
 Since yaCut must use OpenMP macros in its macros, things get a little bit
 complicated. We have to declare 4 macros for each parallel test to execute
-in exact order. These macros have dummy name, just add code. The simplese way
-to explain them is through an example.
+in exact order. These macros have dummy name, they just replace code.
+The simplest way to explain them is through an example.
 
 
 -----------------------------------------------------------------------------
@@ -302,7 +303,7 @@ last parameter. The message can be a string literal or a char*. UTF-8 strings
 are accepted but wchar_t* strings or literals do not work. See YCT_ASSERT_MSG
 below as example.
 Assertions are typically used inside YCT_TEST block. However you can use them
-inside a YCT_SUITE scope too. They can be even used in YCT_BEGIN context if it
+inside a YCT_SUITE scope too. They can also be used in YCT_BEGIN context if it
 resides inside a function that returns void. YCT_MESSAGE doesn't have this
 limitation and can be used in any YCT context.
 
