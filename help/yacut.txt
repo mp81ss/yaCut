@@ -140,7 +140,8 @@ context. On the other side, leaving standard declarations, you can prepend
 "NO_" to YCT_TEST_ADD/YCT_TEST_RUN/YCT_SUITE_RUN inside YCT_BEGIN/YCT_END
 or YCY_SUITE context. The 3rd way is to call YCT_DISABLE to skip all
 following tests/suites and possibly restore standard behaviour by calling
-YCT_ENABLE. See code example ex_skip.c
+YCT_ENABLE.
+See code example ex_skip.c
 
 DISABLE_YCT_TEST(test);
 The defined test will not execute, when inside a suite or when explicitly
@@ -183,7 +184,7 @@ With YCT_SET_BLOCKED you can stop execution when an assertion fails.
 With YCT_SET_FULL_BLOCKED execution stops when a warning is issued too.
 The locking mode is isolated to current context (YCT_BEGIN/YCT_END block).
 If you have multiple YCT_BEGIN/YCT_END blocks and one get locked, you have
-to stop others manually. (if !yct_is_locked() ...).
+to stop others manually. (if !YCT_IS_LOCKED() ...).
 See code example ex_block.c
 
 YCT_SET_BLOCKED();
@@ -200,7 +201,7 @@ fail.
 ATTENTION: This call has NO EFFECT if context is already locked!
 
 YCT_IS_LOCKED();
-Returns NON-ZERO if the current context is locked (a failure occurred and some
+Returns non-zero if the current context is locked (a failure occurred and some
 blocking mode was set). Otherwise returns 0.
 
 
