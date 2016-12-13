@@ -10,7 +10,7 @@
 #ifndef YACUT_H_
 #define YACUT_H_
 
-#include <stdio.h>
+#include <stdio.h> // fprintf and NULL
 #ifndef YCT_OPT_DISABLE_TIMING
 #include <time.h>
 #endif
@@ -198,13 +198,11 @@ struct yct_context {
     test_name##_YCT_DISABLED_SUITE_(struct yct_context* const p_yct_ctx_) { \
         void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
 
-#define VNUT_YCT_FPUTC(c) ((void)fputc((c), p_yct_ctx_->out))
-#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, str))
-#define VNUT_YCT_PRINT_STR(str) \
-    do { (void)fputs((void*)(str), p_yct_ctx_->out); } while (0)
+#define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
+#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
 
-#define VNUT_YCT_PRINT_TEST(name) if (yct_ctx_.out != NULL) {       \
-    VNUT_YCT_PRINT_STR("Executing test:  "); VNUT_YCT_FPUTS(#name); \
+#define VNUT_YCT_PRINT_TEST(name) if (yct_ctx_.out != NULL) {   \
+    VNUT_YCT_FPUTS("Executing test:  "); VNUT_YCT_FPUTS(#name); \
     VNUT_YCT_FPUTC('\n'); }
 
 #define VNUT_YCT_PRINT_END_NAME()                                           \
@@ -283,7 +281,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE  \
                           | VNUT_YCT_FLAGS_LOG);               \
         if (yct_ctx_.out != NULL) {                            \
-            VNUT_YCT_PRINT_STR("Executing suite: ");           \
+            VNUT_YCT_FPUTS("Executing suite: ");               \
             VNUT_YCT_FPUTS(#suite_name); VNUT_YCT_FPUTC('\n'); \
         }                                                      \
         suite_name(&yct_ctx_);                                 \
@@ -430,11 +428,11 @@ if (p_yct_ctx_->out != NULL) {                                               \
 
 #define VNUT_YCT_PRINT_MAIN(main_msg)                       \
     if (p_yct_ctx_->out != NULL) {                          \
-        VNUT_YCT_PRINT_STR(__FILE__);                       \
+        VNUT_YCT_FPUTS(__FILE__);                           \
         (void)fprintf(p_yct_ctx_->out, ":%d: [", __LINE__); \
-        VNUT_YCT_PRINT_STR(YCT_FUNC_NAME);                  \
+        VNUT_YCT_FPUTS(YCT_FUNC_NAME);                      \
         VNUT_YCT_FPUTS("]: ");                              \
-        VNUT_YCT_PRINT_STR(main_msg);                       \
+        VNUT_YCT_FPUTS(main_msg);                           \
         VNUT_YCT_FPUTS(": ");                               \
     }
 
@@ -442,7 +440,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_PRINT_MAIN(main_msg);          \
     if (p_yct_ctx_->out != NULL) {          \
         VNUT_YCT_FPUTC('(');                \
-        VNUT_YCT_PRINT_STR(cond);           \
+        VNUT_YCT_FPUTS(cond);               \
         VNUT_YCT_FPUTC(')');                \
     }                                       \
 } while (0)
@@ -451,7 +449,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_PRINT(main_msg, cond);                  \
     if (p_yct_ctx_->out != NULL) {                   \
         VNUT_YCT_FPUTS(" { \"");                     \
-        VNUT_YCT_PRINT_STR(msg);                     \
+        VNUT_YCT_FPUTS(msg);                         \
         VNUT_YCT_FPUTS("\" }\n");                    \
     }                                                \
 } while (0)
@@ -473,7 +471,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
     VNUT_YCT_PRINT_MAIN("MESSAGE"); \
     if (p_yct_ctx_->out != NULL) {  \
         VNUT_YCT_FPUTS("{ \"");     \
-        VNUT_YCT_PRINT_STR(msg);    \
+        VNUT_YCT_FPUTS(msg);        \
         VNUT_YCT_FPUTS("\" }\n");   \
     }                               \
 } while (0)
@@ -583,7 +581,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
                 VNUT_YCT_PRINT_VAR(actual);                     \
                 VNUT_YCT_FPUTS("> { \"");                       \
-                VNUT_YCT_PRINT_STR(msg);                        \
+                VNUT_YCT_FPUTS(msg);                            \
                 VNUT_YCT_FPUTS("\" }\n");                       \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
@@ -619,7 +617,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
                 VNUT_YCT_FPUTS(": Both values were: <"); \
                 VNUT_YCT_PRINT_VAR(v1);                  \
                 VNUT_YCT_FPUTS("> { \"");                \
-                VNUT_YCT_PRINT_STR(msg);                 \
+                VNUT_YCT_FPUTS(msg);                     \
                 VNUT_YCT_FPUTS("\" }\n");                \
             }                                            \
             p_yct_ctx_->failed = 1;                      \
@@ -636,7 +634,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
                 VNUT_YCT_FPUTC('(');           \
-                VNUT_YCT_PRINT_STR(#var);      \
+                VNUT_YCT_FPUTS(#var);          \
                 VNUT_YCT_FPUTS(" == NULL)\n"); \
             }                                  \
             p_yct_ctx_->failed = 1;            \
@@ -653,9 +651,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");        \
             if (p_yct_ctx_->out != NULL) {        \
                 VNUT_YCT_FPUTC('(');              \
-                VNUT_YCT_PRINT_STR(#var);         \
+                VNUT_YCT_FPUTS(#var);             \
                 VNUT_YCT_FPUTS(" == NULL) { \""); \
-                VNUT_YCT_PRINT_STR(msg);          \
+                VNUT_YCT_FPUTS(msg);              \
                 VNUT_YCT_FPUTS("\" }\n");         \
             }                                     \
             p_yct_ctx_->failed = 1;               \
@@ -672,7 +670,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
                 VNUT_YCT_FPUTC('(');           \
-                VNUT_YCT_PRINT_STR(#var);      \
+                VNUT_YCT_FPUTS(#var);          \
                 VNUT_YCT_FPUTS(" != NULL)\n"); \
             }                                  \
             p_yct_ctx_->failed = 1;            \
@@ -689,10 +687,10 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");  \
             if (p_yct_ctx_->out != NULL) {  \
                 VNUT_YCT_FPUTC('(');        \
-                VNUT_YCT_PRINT_STR(#var);   \
+                VNUT_YCT_FPUTS(#var);       \
                 VNUT_YCT_FPUTS(" != NULL"); \
                 VNUT_YCT_FPUTS(") { \"");   \
-                VNUT_YCT_PRINT_STR(msg);    \
+                VNUT_YCT_FPUTS(msg);        \
                 VNUT_YCT_FPUTS("\" }\n");   \
             }                               \
             p_yct_ctx_->failed = 1;         \
@@ -718,9 +716,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \
                 VNUT_YCT_FPUTS(": Expected: <");                \
-                VNUT_YCT_PRINT_STR(expected);                   \
+                VNUT_YCT_FPUTS(expected);                       \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
-                VNUT_YCT_PRINT_STR(actual);                     \
+                VNUT_YCT_FPUTS(actual);                         \
                 VNUT_YCT_FPUTS(">\n");                          \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
@@ -739,11 +737,11 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
             if (p_yct_ctx_->out != NULL) {                      \
                 VNUT_YCT_FPUTS(": Expected: <");                \
-                VNUT_YCT_PRINT_STR(expected);                   \
+                VNUT_YCT_FPUTS(expected);                       \
                 VNUT_YCT_FPUTS(">, Actual: <");                 \
-                VNUT_YCT_PRINT_STR(actual);                     \
+                VNUT_YCT_FPUTS(actual);                         \
                 VNUT_YCT_FPUTS("> { \"");                       \
-                VNUT_YCT_PRINT_STR(msg);                        \
+                VNUT_YCT_FPUTS(msg);                            \
                 VNUT_YCT_FPUTS("\" }\n");                       \
             }                                                   \
             p_yct_ctx_->failed = 1;                             \
@@ -762,7 +760,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2);  \
             if (p_yct_ctx_->out != NULL) {                 \
                 VNUT_YCT_FPUTS(": 'Both strings were: <"); \
-                VNUT_YCT_PRINT_STR(str1);                  \
+                VNUT_YCT_FPUTS(str1);                      \
                 VNUT_YCT_FPUTS(">'\n");                    \
             }                                              \
             p_yct_ctx_->failed = 1;                        \
@@ -781,9 +779,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2);  \
             if (p_yct_ctx_->out != NULL) {                 \
                 VNUT_YCT_FPUTS(": 'Both strings were: <"); \
-                VNUT_YCT_PRINT_STR(str1);                  \
+                VNUT_YCT_FPUTS(str1);                      \
                 VNUT_YCT_FPUTS(">' { \"");                 \
-                VNUT_YCT_PRINT_STR(msg);                   \
+                VNUT_YCT_FPUTS(msg);                       \
                 VNUT_YCT_FPUTS("\" }\n");                  \
             }                                              \
             p_yct_ctx_->failed = 1;                        \
@@ -824,7 +822,7 @@ if (p_yct_ctx_->out != NULL) {                                               \
             if (p_yct_ctx_->out != NULL) {                              \
                 (void)fprintf(p_yct_ctx_->out,                          \
                       ": 'Element [%u] was different' { \"", yct_out_); \
-                VNUT_YCT_PRINT_STR(msg);                                \
+                VNUT_YCT_FPUTS(msg);                                    \
                 VNUT_YCT_FPUTS("\" }\n");                               \
             }                                                           \
             p_yct_ctx_->failed = 1;                                     \
@@ -871,9 +869,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");           \
             if (p_yct_ctx_->out != NULL) {           \
                 VNUT_YCT_FPUTC('(');                 \
-                VNUT_YCT_PRINT_STR(#expected);       \
+                VNUT_YCT_FPUTS(#expected);           \
                 VNUT_YCT_FPUTS(" == ");              \
-                VNUT_YCT_PRINT_STR(#actual);         \
+                VNUT_YCT_FPUTS(#actual);             \
                 VNUT_YCT_FPUTS(")\n");               \
             }                                        \
             p_yct_ctx_->failed = 1;                  \
@@ -890,11 +888,11 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");                    \
             if (p_yct_ctx_->out != NULL) {                    \
                 VNUT_YCT_FPUTC('(');                          \
-                VNUT_YCT_PRINT_STR(#expected);                \
+                VNUT_YCT_FPUTS(#expected);                    \
                 VNUT_YCT_FPUTS(" == ");                       \
-                VNUT_YCT_PRINT_STR(#actual);                  \
+                VNUT_YCT_FPUTS(#actual);                      \
                 VNUT_YCT_FPUTS(") { \"");                     \
-                VNUT_YCT_PRINT_STR(msg);                      \
+                VNUT_YCT_FPUTS(msg);                          \
                 VNUT_YCT_FPUTS("\" }\n");                     \
             }                                                 \
             p_yct_ctx_->failed = 1;                           \
@@ -911,9 +909,9 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");         \
             if (p_yct_ctx_->out != NULL) {         \
                 VNUT_YCT_FPUTC('(');               \
-                VNUT_YCT_PRINT_STR(#obj1);         \
+                VNUT_YCT_FPUTS(#obj1);             \
                 VNUT_YCT_FPUTS(" != ");            \
-                VNUT_YCT_PRINT_STR(#obj2);         \
+                VNUT_YCT_FPUTS(#obj2);             \
                 VNUT_YCT_FPUTS(")\n");             \
             }                                      \
             p_yct_ctx_->failed = 1;                \
@@ -930,11 +928,11 @@ if (p_yct_ctx_->out != NULL) {                                               \
             VNUT_YCT_PRINT_MAIN("FAILED");                  \
             if (p_yct_ctx_->out != NULL) {                  \
                 VNUT_YCT_FPUTC('(');                        \
-                VNUT_YCT_PRINT_STR(#obj1);                  \
+                VNUT_YCT_FPUTS(#obj1);                      \
                 VNUT_YCT_FPUTS(" != ");                     \
-                VNUT_YCT_PRINT_STR(#obj2);                  \
+                VNUT_YCT_FPUTS(#obj2);                      \
                 VNUT_YCT_FPUTS(") { \"");                   \
-                VNUT_YCT_PRINT_STR(msg);                    \
+                VNUT_YCT_FPUTS(msg);                        \
                 VNUT_YCT_FPUTS("\" }\n");                   \
             }                                               \
             p_yct_ctx_->failed = 1;                         \

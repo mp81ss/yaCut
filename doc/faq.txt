@@ -1,6 +1,6 @@
 1:  Q:  gcc -ansi gives errors. Why?
-    A:  yaCut relies on C99. Replace -ansi with -std=c99 (or equivalent switch
-        in your compiler).
+    A:  GNU gcc treat -ansi as C89. yaCut relies on C99. Replace -ansi with
+        -std=c99 or newer standard (or equivalent switch in your compiler).
 
 2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appear.
         Why?

@@ -1,35 +1,3 @@
-2.0 (Not yest released, currently under testing)
-
-    FIX: Minor bugs on array functions
-    ADD: Log support
-    ADD: Timing support
-    ADD: Parallel tests support
-    ADD: Preprocessor message for each yaCut option (YCT_OPT_...) specified
-    ADD: Several utilities macro (see file help.txt)
-    CHG: Naming convention of input options (now all begin with YCT_OPT_...)
-         Broken compatibility:
-         Versions up to v1.0.3 use the old name. Next versions and all
-         versions 2.x use the new convention, so changed major version)
-    CHG: Esthetic of internal code
-    DEL: YCT_GET_DATA
-         (Broken compatibility with version 1.x, so changed major version)
-
-
-1.0.3 (17 Sep 2016)
-
-    FIX: Documentation fix
-
-
-1.0.2 (11 Sep 2016)
-
-    FIX: Documentation fix and minor code improvements
-
-
-1.0.1 (03 Sep 2016)
-
-    FIX: Error on managing failed total and documentation fix
-
-
-1.0 (28 Nov 2015)
+2.0 ( Dec 2016)
 
     Initial version
