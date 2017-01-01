@@ -1,23 +1,17 @@
-1:  Q:  gcc -ansi gives errors. Why?
-    A:  GNU gcc treat -ansi as C89. yaCut relies on C99. Replace -ansi with
-        -std=c99 or newer standard (or equivalent switch in your compiler).
+1:  Q:  Sometimes, compilation errors appear. Why?
+    A:  Look at the YCT_FUNC_NAME macro.
 
-2:  Q:  In MS-DOS, compilation errors that are absent in more recent OS appear.
-        Why?
-    A:  Try defining YCT_OPT_DISABLE_INT64. If still not resolved, look at
-        YCT_FUNC_NAME macro.
-
-    2q: Q: In MS-DOS, cannot link. Why?
+    2q: Q: In MS-DOS, linking fails. Why?
     2a: A: Allow more segments for code (medium or large memory model).
 
-3:  Q:  I can compile/link, but generated executable is very big. Why?
+2:  Q:  I can compile/link, but generated executable is very big. Why?
     A:  yaCut is macro based. If you can, avoid log by defining the macro
         YCT_OPT_DISABLE_LOG. yaCut cannot do anything else. You can always
         instruct your compiler to enable space optimizations and strip symbols.
         Last thing is to compress your executable file.
         Splitting your code in multiple smaller files may help.
 
-4:  Q:  Which version to choose?
+3:  Q:  Which version to choose?
     A:  Release packages are quite tested and stable. Branches contain bugfix,
         improvements and new features, but may not be stable, not fully tested
         or may even fail to compile.

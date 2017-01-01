@@ -1,10 +1,9 @@
                                 YACUT v2.0 manual
 
 This file describes the usage of the yacut C testing framework.
-It is just a single C99 header, just include and compile it.
-C99 or newer is recommended, older standards may work or not.
-The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. It is the standard
-way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
+It is just a single ANSI C header, just include it and compile.
+The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. This is the
+standard way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
 code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
@@ -70,8 +69,10 @@ yaCut context (see how assertions write).
 Handle must be already opened and writable. It won't be closed.
 
 YCT_GET_RETURN_VALUE(status);
-Put current context failure level in passed integer variable.
-The var status will be 0 if all ok, 1 if some warning, 2 on assertions failure.
+Give a status number according to current context.
+The integer variable status will be 0 if all ok, 1 if some warning, or 2 on
+assertions failure. It is recommended to use YCT_STATUS_OK, YCT_STATUS_WARNING
+and YCT_STATUS_FAILED macros instead of numbers.
 
 YCT_LAST_FAILED();
 Return non-zero if last test/suite fails, zero otherwise. It is updated at the

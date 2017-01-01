@@ -15,4 +15,4 @@ YCT_TEST(test)
     YCT_ASSERT_NOT_NULL(p);
 }
 
-YCT_MAIN(test)
+YCT_MAIN(test) /* no semicolon here */
