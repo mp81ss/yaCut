@@ -4,7 +4,7 @@ Yet Another C "Unit" Test framework
 
 - Single header, ready to use
 - Very fast (no system call or complex operations)
-- Highly Portable (C99)
+- Maximum portability (ansi C)
 - Follow xUnit architecture
 - Support Messages, Warnings and Assertions
 - Lot of assertions (values, floating point, strings, arrays, objects)

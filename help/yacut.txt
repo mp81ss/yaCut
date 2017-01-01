@@ -1,38 +1,20 @@
                                 YACUT v1.0 manual
 
 This file describes the usage of the yacut C testing framework.
-It is just a single C99 header, just include and compile it.
-C99 or newer is recommended, older standards may work.
-The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. It is the standard
-way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
+It is just a single ANSI C header, just include it and compile.
+The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. This is the
+standard way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
 code. All macros start with YCT_. If your editor is smart enough just type
 "YCT_" and it should offer you ALL available macros.
-yaCut support some input parameter (see next section).
+yaCut doesn't support some input parameter, but if compilation fails, or
+output is not as expected, you can look at the macro YCT_FUNC_NAME.
 Next section describes the macro you can define BEFORE including yaCut.
 You can ignore them unless you have compilation errors.
 Then follows a list of all available macros (excluding the *_MSG version).
 
 
------------------------------------------------------------------------------
-
-
-SECTION: Parameters
-These macros can be defined BEFORE including yacut. They might be able to
-support some compiler errors.
-
-YCT_FUNC_NAME
-yaCut tries to guess it, and usually succeeds. If it fails, you can help it by
-defining it with the value your compiler assigns to the current function name.
-Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
-The worst case is to define it to a constant ("unknown") to allow compilation.
-
-YCT_DISABLE_INT64
-yaCut can disable the int64 support. This prevents compilation errors on some
-old 16bit compiler for example.
-
-
------------------------------------------------------------------------------
+------------------------------------------------------------------------------
 
 
 SECTION: General
@@ -43,20 +25,26 @@ Returns a string literal representing the name of the library.
 
 YCT_VERSION_MAJOR();
 Returns an integer representing the major version of the library.
+Present in ALL versions of yaCut, use this macro to detect yaCut presence.
 
 YCT_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
 YCT_SET_OUTPUT(handle);
-Set the output handle. The default is stdout. You can pass your FILE* object.
-Handle must be already opened and writeable.
+Set the output handle. The default is stdout. You can pass your FILE* variable.
+This macro is to be used in a main context. If you want to change the output
+handle inside another context (test/suite), you have to access the internal
+yaCut context (see how assertions write).
+Handle must be already opened and writable. It won't be closed.
 
 YCT_GET_DATA(context);
 The current struct yct_context is copied to context. For advanced users.
 
 YCT_GET_RETURN_VALUE(status);
-Return an integer according to current context.
-The var status will be 0 if all ok, 1 if some warning, 2 on assertions failure.
+Give a status number according to current context.
+The integer variable status will be 0 if all ok, 1 if some warning, or 2 on
+assertions failure. It is recommended to use YCT_STATUS_OK, YCT_STATUS_WARNING
+and YCT_STATUS_FAILED macros instead of numbers.
 
 YCT_DUMP_SHORT();
 Print something like "all ok" or "some warning" or "some failure".
@@ -120,7 +108,8 @@ the YCT_SUITE_END macro, no return value is allowed. To be used in global
 scope.
 
 YCT_SUITE_END
-Close the suite opened by YCT_SUITE.
+Close the suite opened by YCT_SUITE. Note that no parentheses and/or semicolon
+follow. This macro must be put after the YCT_SUITE block.
 
 YCT_TEST_ADD(test);
 Add test test to current suite. To be used inside YCT_SUITE context.
@@ -147,10 +136,10 @@ DISABLE_YCT_TEST(test);
 The defined test will not execute, when inside a suite or when explicitly
 called by YCT_TEST_RUN macro.
 
-DISABLE_YCT_SUITE(suite);
+DISABLE_YCT_SUITE(suite, f_setup, f_teardown);
 The defined suite will not execute when called by YCT_SUITE_RUN macro.
 
-NO_YCT_TEST_RUN(test);
+NO_YCT_TEST_RUN(test)
 The passed test will NOT execute. The test can be declared normally or
 with the now redundant DISABLE_YCT_TEST macro. It is simply ignored.
 
@@ -242,7 +231,8 @@ YCT_ASSERT_EQUAL(a, b);
 Abort current test if a != b. Do NOT use with strings/array/objects (structs).
 Technically this assertion can be used with pointers since they are elementary
 types, but keep in mind that this will compare pointers only, NOT the pointed
-data!
+data! Since version 1.0.4, values will be converted to double, so some
+incorrect reporting may be encountered (ex.: integers > 2^53)
 
 YCT_ASSERT_NOT_EQUAL(a, b);
 Abort current test if a == b. See notes above.

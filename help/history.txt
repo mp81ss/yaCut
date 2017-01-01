@@ -1,13 +1,15 @@
 1.0.4 ( Dec 2016)
 
+    ADD: This file
     FIX: Bad string handling on writing
     FIX: Minor bugs on array functions
     FIX: YCT_BEGIN now accept NULL too
     FIX: Improved function name detection macro YCT_FUNC_NAME
-    FIX: Decreased the number of syscall when writing
     FIX: Removed some warning
-    CHG: Naming convention of input options (now all begin with YCT_OPT_...)
+    CHG: Changed values printing format to hexadecinal unsigned
+    CHG: Removed C99 dependency, now full C89 compliance
     CHG: Esthetic of internal code
+    DEL: YCT_DISABLE_INT64 and YCT_OPT_DISABLE_INT64 options
 
 
 1.0.3 (17 Sep 2016)
