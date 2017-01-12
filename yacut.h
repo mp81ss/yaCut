@@ -1,6 +1,6 @@
-/* timing for each test, null string comparison, test ALL...
+/* timing for each test, test ALL...
  *  yaCut v2.0 - Yet Another C Unit Test
- *  Copyright (c) 2016 - Michele Pes
+ *  Copyright (c) 2017 - Michele Pes
  *
  *  Distributed under the BSD License
  *  See accompanying file LICENSE.txt or copy at
@@ -10,10 +10,27 @@
 #ifndef YACUT_H_
 #define YACUT_H_
 
-#include <stdio.h> /* fprintf/NULL */
-#ifndef YCT_OPT_DISABLE_TIMING
-#include <time.h> /* For timing functions prototype */
+#include <stdio.h>
+
+#define VNUT_YCT_FPUTC(c)   ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
+#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
+
+#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
+#include <wchar.h>
+#define VNUT_YCT_FPUTWS(str) ((void)fwprintf(p_yct_ctx_->out, "%s", (str)))
+#else
+#define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
 #endif
+
+#ifndef YCT_OPT_DISABLE_TIMING
+#include <time.h>
+#endif
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifndef YCT_FUNC_NAME
 #if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
@@ -23,7 +40,7 @@
 #elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
 #define YCT_FUNC_NAME __func__
 #elif defined(__GNUC__)
-#define YCT_FUNC_NAME __PRETTY_FUNCTION__
+#define YCT_FUNC_NAME __FUNCTION__
 #else
 #define YCT_FUNC_NAME "YCT_TEST"
 #endif
@@ -202,8 +219,12 @@ struct yct_context {
     test_name##_YCT_DISABLED_SUITE_(struct yct_context* const p_yct_ctx_) { \
         void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
 
-#define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
-#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
+
+#define VNUT_YCT_PRINT_STR_VAR(str) do {                            \
+    if ((str) == NULL) VNUT_YCT_FPUTS("NULL");                      \
+    else {                                                          \
+        if (sizeof(*(str)) < 2) VNUT_YCT_FPUTS(str);                \
+        else VNUT_YCT_FPUTWS(str); } } while (0)
 
 #define VNUT_YCT_PRINT_TEST(name) if (yct_ctx_.out != NULL) {   \
     VNUT_YCT_FPUTS("Executing test:  "); VNUT_YCT_FPUTS(#name); \
@@ -681,13 +702,18 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         }                                   \
     }
 
-#define VNUT_YCT_COMPARE_STR(str1, str2, out) do {                   \
-    unsigned int vnut_yct_i_; out = 0;                               \
-    for (vnut_yct_i_ = 0; str1[vnut_yct_i_] != 0                     \
-                          && str1[vnut_yct_i_] == str2[vnut_yct_i_]; \
-         vnut_yct_i_++) ;                                            \
-    out = (int)((unsigned int)str1[vnut_yct_i_]                      \
-                - (unsigned int)str2[vnut_yct_i_]);                  \
+#define VNUT_YCT_COMPARE_STR(str1, str2, out) do {                       \
+    out = 0;                                                             \
+    if (((str1) == NULL) && ((str2) != NULL)) out = -1;                  \
+    else { if (((str1) != NULL) && ((str2) == NULL)) out = 1; }          \
+    if (out == 0) {                                                      \
+        unsigned int vnut_yct_i_;                                        \
+        for (vnut_yct_i_ = 0; str1[vnut_yct_i_] != 0                     \
+                              && str1[vnut_yct_i_] == str2[vnut_yct_i_]; \
+             vnut_yct_i_++) ;                                            \
+        out = (int)((unsigned int)str1[vnut_yct_i_]                      \
+                    - (unsigned int)str2[vnut_yct_i_]);                  \
+    }                                                                    \
 } while (0)
 
 #define YCT_ASSERT_EQUAL_STR(expected, actual) VNUT_YCT_IF_OK { \
@@ -699,9 +725,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         VNUT_YCT_PRINT("FAILED", #expected " == " #actual);     \
         if (p_yct_ctx_->out != NULL) {                          \
             VNUT_YCT_FPUTS(": Expected: <");                    \
-            VNUT_YCT_FPUTS(expected);                           \
+            VNUT_YCT_PRINT_STR_VAR(expected);                   \
             VNUT_YCT_FPUTS(">, Actual: <");                     \
-            VNUT_YCT_FPUTS(actual);                             \
+            VNUT_YCT_PRINT_STR_VAR(actual);                     \
             VNUT_YCT_FPUTS(">\n");                              \
         }                                                       \
         p_yct_ctx_->failed = 1;                                 \
@@ -720,9 +746,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual);    \
             if (p_yct_ctx_->out != NULL) {                         \
                 VNUT_YCT_FPUTS(": Expected: <");                   \
-                VNUT_YCT_FPUTS(expected);                          \
+                VNUT_YCT_PRINT_STR_VAR(expected);                  \
                 VNUT_YCT_FPUTS(">, Actual: <");                    \
-                VNUT_YCT_FPUTS(actual);                            \
+                VNUT_YCT_PRINT_STR_VAR(actual);                    \
                 VNUT_YCT_FPUTS("> { \"");                          \
                 VNUT_YCT_FPUTS(msg);                               \
                 VNUT_YCT_FPUTS("\" }\n");                          \
@@ -743,7 +769,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2);    \
             if (p_yct_ctx_->out != NULL) {                   \
                 VNUT_YCT_FPUTS(": 'Both strings were: <");   \
-                VNUT_YCT_FPUTS(str1);                        \
+                VNUT_YCT_PRINT_STR_VAR(str1);                \
                 VNUT_YCT_FPUTS(">'\n");                      \
             }                                                \
             p_yct_ctx_->failed = 1;                          \
@@ -762,7 +788,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_PRINT("FAILED", #str1 " != " #str2);    \
             if (p_yct_ctx_->out != NULL) {                   \
                 VNUT_YCT_FPUTS(": 'Both strings were: <");   \
-                VNUT_YCT_FPUTS(str1);                        \
+                VNUT_YCT_PRINT_STR_VAR(str1);                \
                 VNUT_YCT_FPUTS(">' { \"");                   \
                 VNUT_YCT_FPUTS(msg);                         \
                 VNUT_YCT_FPUTS("\" }\n");                    \
@@ -975,5 +1001,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_RETURN();                               \
         }                                                    \
     }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* YACUT_H_ */
