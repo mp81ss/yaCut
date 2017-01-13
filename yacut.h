@@ -1,4 +1,11 @@
-/* timing for each test, test ALL...
+/* 
+ * MSVC compilers before VC7 (< 1310) don't have __func__ at all; later ones call it __FUNCTION__.
+ * func_name for M$ and boland,
+ * test unicode
+ * timing for each test (> 2.0 ?)
+ */
+
+/* 
  *  yaCut v2.0 - Yet Another C Unit Test
  *  Copyright (c) 2017 - Michele Pes
  *
@@ -15,9 +22,12 @@
 #define VNUT_YCT_FPUTC(c)   ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
 #define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
 
-#if (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
+#if ( (!defined YCT_DISABLE_UNICODE)                                   \
+      && ( (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)) \
+           || (defined WCHAR_MIN) || (defined YCT_FORCE_UNICODE) ) )
 #include <wchar.h>
-#define VNUT_YCT_FPUTWS(str) ((void)fwprintf(p_yct_ctx_->out, "%s", (str)))
+#define YCT_HAS_UNICODE
+#define VNUT_YCT_FPUTWS(str) ((void)fwprintf(p_yct_ctx_->out, L"%s", (str)))
 #else
 #define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
 #endif
