@@ -1,11 +1,4 @@
-/* 
- * MSVC compilers before VC7 (< 1310) don't have __func__ at all; later ones call it __FUNCTION__.
- * func_name for M$ and boland,
- * test unicode
- * timing for each test (> 2.0 ?)
- */
-
-/* 
+/*
  *  yaCut v2.0 - Yet Another C Unit Test
  *  Copyright (c) 2017 - Michele Pes
  *
@@ -22,11 +15,8 @@
 #define VNUT_YCT_FPUTC(c)   ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
 #define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
 
-#if ( (!defined YCT_DISABLE_UNICODE)                                   \
-      && ( (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)) \
-           || (defined WCHAR_MIN) || (defined YCT_FORCE_UNICODE) ) )
+#ifndef YCT_DISABLE_WCHAR
 #include <wchar.h>
-#define YCT_HAS_UNICODE
 #define VNUT_YCT_FPUTWS(str) ((void)fwprintf(p_yct_ctx_->out, L"%s", (str)))
 #else
 #define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
@@ -36,21 +26,23 @@
 #include <time.h>
 #endif
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-
 #ifndef YCT_FUNC_NAME
-#if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
+#if ( ( defined(_MSC_VER) && (_MSC_VER >= 1310) ) || defined(__WATCOMC__) )
 #define YCT_FUNC_NAME __FUNCTION__
-#elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x550))
+#elif ( defined(__GNUC__) || defined(__ICC) || defined(__IBMC__) )
+#define YCT_FUNC_NAME __FUNCTION__
+#elif ( defined(__BORLANDC__) && (__BORLANDC__ > 0x520)
 #define YCT_FUNC_NAME __FUNC__
+#elif defined(__FUNCSIG__)
+#define _FUNCTION YCT_FUNC_NAME __FUNCSIG__
 #elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
 #define YCT_FUNC_NAME __func__
-#elif defined(__GNUC__)
-#define YCT_FUNC_NAME __FUNCTION__
+#elif ( defined(__cplusplus) && (__cplusplus >= 201103) )
+#define YCT_FUNC_NAME __func__
 #else
 #define YCT_FUNC_NAME "YCT_TEST"
 #endif

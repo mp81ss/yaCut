@@ -21,10 +21,6 @@ SECTION: Parameters
 These macros can be defined BEFORE including yacut. They might be able to
 support some compiler errors.
 
-YCT_OPT_DISABLE_INT64
-yaCut can disable the int64 support. This prevents compilation errors on some
-old 16bit compiler for example.
-
 YCT_OPT_DISABLE_LOG
 Defining this macro remove log support. If you don't need log, you can have
 smaller executable.
@@ -36,13 +32,10 @@ YCT_OPT_ENABLE_PARALLEL
 Define this macro to enable parallel tests execution.
 See section "Parallel" below.
 
-YCT_DISABLE_UNICODE
-This macro forces yaCut to not include <wchar.h> header. This means that you
+YCT_DISABLE_WCHAR
+This macro makes yaCut ignore <wchar.h> header. This means that you
 can still compare wchar_t variables, but yaCut will report them as "???".
-
-YCT_FORCE_UNICODE
-If yaCut thinks your compiler does not have <wchar.h> header but this results
-in error, you can force yaCut to assume it, by defining this macro.
+Use this macro for very old compilers that don't have support for <wchar.h>
 
 YCT_FUNC_NAME
 This is not a real parameter. This is the macro (if defined so) that the
@@ -52,11 +45,6 @@ guess it, and usually succeeds. If it fails, you can help it by defining it
 with the value your compiler assign to the current function name.
 Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
 The worst case is to define it to a constant ("unknown") to allow compilation.
-
-YCT_HAS_UNICODE
-This is an output parameter, since it is defined by yaCut.
-If defined, unicode strings will be shown correctly, otherwise just 3 question
-marks will be shown.
 
 
 -----------------------------------------------------------------------------

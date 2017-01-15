@@ -1,5 +1,5 @@
-1:  Q:  Sometimes, compilation errors appear. Why?
-    A:  Look at the YCT_FUNC_NAME macro.
+1:  Q:  With my compiler, errors appear. Why?
+    A:  Try defining YCT_DISABLE_WCHAR and/or modify YCT_FUNC_NAME macro.
 
     2q: Q: In MS-DOS, linking fails. Why?
     2a: A: Allow more segments for code (medium or large memory model).
@@ -7,7 +7,7 @@
 2:  Q:  I can compile/link, but generated executable is very big. Why?
     A:  yaCut is macro based. If you can, avoid log by defining the macro
         YCT_OPT_DISABLE_LOG. yaCut cannot do anything else. You can always
-        instruct your compiler to enable space optimizations and strip symbols.
+        enable space optimizations in your compiler and strip symbols.
         Last thing is to compress your executable file.
         Splitting your code in multiple smaller files may help.
 
