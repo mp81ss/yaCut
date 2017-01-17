@@ -20,6 +20,8 @@ YCT_TEST(test_setup)
 {
     const char* msg = "WAS SETUP CALLED?";
     YCT_ASSERT_EQUAL_MSG(0, x, msg);
+    YCT_ASSERT_NOT_NULL(YCT_PARAMETER);
+    YCT_MESSAGE(YCT_PARAMETER);
 }
 
 YCT_TEST(test_teardown)
@@ -30,16 +32,21 @@ YCT_TEST(test_teardown)
 /* Note that NULL can be passed for setup/teardown if not needed. */
 YCT_SUITE(suite, setup, teardown)
 {
-    /* suite_setup(); Any defined function as suite setup. */
+    const char* parameter = "yaCut Parameter";
 
-    /* setup() will be executed BEFORE EACH TEST in the suite. */
+    /* suite_setup Any defined function as suite setup. */
+
+    /* setup(); will be executed BEFORE EACH TEST in the suite. */
+
+    YCT_SET_PARAMETER(parameter);
+    /* All tests in this suite will receive this parameter */
 
     YCT_TEST_ADD(test_setup);
     /* add your tests here */
 
-    /* teardown will be executed AFTER EACH TEST in the suite. */
+    /* teardown(); will be executed AFTER EACH TEST in the suite. */
 
-    /* suite_teardown(); Any defined function as suite teardown. */
+    /* suite_teardown Any defined function as suite teardown. */
 
 }
 YCT_SUITE_END

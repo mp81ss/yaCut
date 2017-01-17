@@ -1,5 +1,5 @@
 1:  Q:  With my compiler, errors appear. Why?
-    A:  Try defining YCT_DISABLE_WCHAR and/or modify YCT_FUNC_NAME macro.
+    A:  Try defining YCT_OPT_DISABLE_WCHAR and/or modify YCT_FUNC_NAME macro.
 
     2q: Q: In MS-DOS, linking fails. Why?
     2a: A: Allow more segments for code (medium or large memory model).

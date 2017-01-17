@@ -32,7 +32,7 @@ YCT_OPT_ENABLE_PARALLEL
 Define this macro to enable parallel tests execution.
 See section "Parallel" below.
 
-YCT_DISABLE_WCHAR
+YCT_OPT_DISABLE_WCHAR
 This macro makes yaCut ignore <wchar.h> header. This means that you
 can still compare wchar_t variables, but yaCut will report them as "???".
 Use this macro for very old compilers that don't have support for <wchar.h>
@@ -116,6 +116,16 @@ YCT_MAIN(test_or_suite);
 This macro defines a custom main so you must not write your own. The parameter
 must be a defined test or suite to be run.
 Note that a single entry test/suite is not a limit (see YCT_BEGIN notes).
+
+YCT_SET_PARAMETER(arg);
+This macro sets a parameter that will be visible to current context and all
+inherited contexts until overwritten by another call to this macro.
+Please note that setup/teardown functions won't have access to the parameter
+because they are of the form void f(void).
+The parameter arg must be a pointer.
+
+YCT_PARAMETER
+The current parameter, default is NULL.
 
 
 -----------------------------------------------------------------------------

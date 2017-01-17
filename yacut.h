@@ -12,14 +12,17 @@
 
 #include <stdio.h>
 
-#define VNUT_YCT_FPUTC(c)   ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
-#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
+#define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (char)(c)))
+#define VNUT_YCT_FPUTS(str) \
+    ((void)fprintf(p_yct_ctx_->out, "%s", (const char*)(str)))
 
-#ifndef YCT_DISABLE_WCHAR
+#ifndef YCT_OPT_DISABLE_WCHAR
 #include <wchar.h>
-#define VNUT_YCT_FPUTWS(str) ((void)fwprintf(p_yct_ctx_->out, L"%s", (str)))
+#define VNUT_YCT_FPUTWS(str) \
+    ((void)fwprintf(p_yct_ctx_->out, L"%s", (const wchar_t*)(str)))
 #else
 #define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
+#pragma message("yaCut: WCHAR DISABLED")
 #endif
 
 #ifndef YCT_OPT_DISABLE_TIMING
@@ -62,6 +65,7 @@ extern "C" {
 #define YCT_VERSION_MINOR() 0
 
 struct yct_context {
+    void* arg;
     const char* msg;
     FILE* out;
 #ifndef YCT_OPT_DISABLE_TIMING
@@ -77,7 +81,6 @@ struct yct_context {
 };
 
 #define VNUT_YCT_INIT_DATA(ctx) \
-    ctx.msg = NULL;             \
     ctx.suites   = 0;           \
     ctx.messages = 0;           \
     ctx.tests    = 0;           \
@@ -194,6 +197,7 @@ struct yct_context {
     struct yct_context* const p_yct_ctx_ = &yct_main_ctx_; \
     VNUT_YCT_INIT_DATA(yct_main_ctx_);                     \
     YCT_SET_OUTPUT(YCT_DEFAULT_OUTPUT);                    \
+    yct_main_ctx_.arg = NULL;                              \
     yct_main_ctx_.msg = (const char*)(name);               \
     VNUT_YCT_GET_START_TIME();
 
@@ -221,6 +225,8 @@ struct yct_context {
     test_name##_YCT_DISABLED_SUITE_(struct yct_context* const p_yct_ctx_) { \
         void (*f_setup_)(void) = setup; void (*f_tear_down_)(void) = teardown;
 
+#define YCT_SET_PARAMETER(par) p_yct_ctx_->arg = (void*)(par)
+#define YCT_PARAMETER p_yct_ctx_->arg
 
 #define VNUT_YCT_PRINT_STR_VAR(str) do {                            \
     if ((str) == NULL) VNUT_YCT_FPUTS("NULL");                      \
@@ -241,6 +247,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
         struct yct_context yct_ctx_;                                         \
         VNUT_YCT_INIT_DATA(yct_ctx_);                                        \
         yct_ctx_.out = p_yct_ctx_->out;                                      \
+        yct_ctx_.arg = p_yct_ctx_->arg;                                      \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,                 \
                           VNUT_YCT_FLAGS_BLOCKING_MODE                       \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
@@ -268,6 +275,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
         struct yct_context yct_ctx_;                                         \
         VNUT_YCT_INIT_DATA(yct_ctx_);                                        \
         yct_ctx_.out = p_yct_ctx_->out;                                      \
+        yct_ctx_.arg = p_yct_ctx_->arg;                                      \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,                 \
                           VNUT_YCT_FLAGS_BLOCKING_MODE                       \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
@@ -301,6 +309,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
         struct yct_context yct_ctx_;                           \
         VNUT_YCT_INIT_DATA(yct_ctx_);                          \
         yct_ctx_.out = p_yct_ctx_->out;                        \
+        yct_ctx_.arg = p_yct_ctx_->arg;                        \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                  \
                            VNUT_YCT_FLAGS_LAST_FAILED);        \
         VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,   \
@@ -357,6 +366,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
     struct yct_context yct_ctx_;                           \
     VNUT_YCT_INIT_DATA(yct_ctx_);                          \
     yct_ctx_.out = p_yct_ctx_->out;                        \
+    yct_ctx_.arg = p_yct_ctx_->arg;                        \
     VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,   \
                       VNUT_YCT_FLAGS_BLOCKING_MODE         \
                       | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE  \
@@ -426,7 +436,8 @@ const int vnut_yct_nibbles_ = (int)(sizeof(var) << 1);                       \
 int vnut_yct_i_, vnut_yct_started_ = 0;                                      \
 char vnut_yct_c_; fprintf(p_yct_ctx_->out, "0x");                            \
 for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
-    vnut_yct_c_ = vnut_yct_hex_chars_[((var) >> (vnut_yct_i_ << 2)) & 0xF];  \
+    vnut_yct_c_ = vnut_yct_hex_chars_[(((long)(var)) >> (vnut_yct_i_ << 2))  \
+                                      & 0xF];                                \
     if (vnut_yct_started_ != 0 || vnut_yct_c_ != '0' || vnut_yct_i_ == 0) {  \
         fprintf(p_yct_ctx_->out, "%c", vnut_yct_c_);                         \
         vnut_yct_started_ = 1; } } } while(0)
