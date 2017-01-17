@@ -28,18 +28,18 @@ YCT_TEST(test_teardown)
 }
 
 /* Note that NULL can be passed for setup/teardown if not needed. */
-YCT_SUITE(suite, &setup, &teardown)
+YCT_SUITE(suite, setup, teardown)
 {
-    /* suite_setup(); Any defined function as suite setup. */
+    /* suite_setup Any defined function as suite setup. */
 
-    /* setup() will be executed BEFORE EACH TEST in the suite. */
+    /* setup(); will be executed BEFORE EACH TEST in the suite. */
 
     YCT_TEST_ADD(test_setup);
     /* add your tests here */
 
-    /* teardown will be executed AFTER EACH TEST in the suite. */
+    /* teardown(); will be executed AFTER EACH TEST in the suite. */
 
-    /* suite_teardown(); Any defined function as suite teardown. */
+    /* suite_teardown Any defined function as suite teardown. */
 
 }
 YCT_SUITE_END
