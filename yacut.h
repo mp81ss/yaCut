@@ -38,11 +38,11 @@ extern "C" {
 #define YCT_FUNC_NAME __FUNCTION__
 #elif ( defined(__GNUC__) || defined(__ICC) || defined(__IBMC__) )
 #define YCT_FUNC_NAME __FUNCTION__
-#elif ( defined(__BORLANDC__) && (__BORLANDC__ > 0x520)
+#elif ( defined(__BORLANDC__) && (__BORLANDC__ > 0x520) )
 #define YCT_FUNC_NAME __FUNC__
 #elif defined(__FUNCSIG__)
 #define _FUNCTION YCT_FUNC_NAME __FUNCSIG__
-#elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
+#elif ( defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901) )
 #define YCT_FUNC_NAME __func__
 #elif ( defined(__cplusplus) && (__cplusplus >= 201103) )
 #define YCT_FUNC_NAME __func__
