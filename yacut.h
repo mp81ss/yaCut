@@ -13,14 +13,18 @@
 #include <stdio.h>
 
 #ifndef YCT_FUNC_NAME
-#if (defined(_MSC_VER) && (_MSC_VER >= 1310)) || defined(__WATCOMC__)
+#if ( ( defined(_MSC_VER) && (_MSC_VER >= 1310) ) || defined(__WATCOMC__) )
 #define YCT_FUNC_NAME __FUNCTION__
-#elif (defined(__BORLANDC__) && (__BORLANDC__ >= 0x550))
+#elif ( defined(__GNUC__) || defined(__ICC) || defined(__IBMC__) )
+#define YCT_FUNC_NAME __FUNCTION__
+#elif ( defined(__BORLANDC__) && (__BORLANDC__ > 0x520) )
 #define YCT_FUNC_NAME __FUNC__
-#elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901))
+#elif defined(__FUNCSIG__)
+#define _FUNCTION YCT_FUNC_NAME __FUNCSIG__
+#elif ( defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901) )
 #define YCT_FUNC_NAME __func__
-#elif defined(__GNUC__)
-#define YCT_FUNC_NAME __PRETTY_FUNCTION__
+#elif ( defined(__cplusplus) && (__cplusplus >= 201103) )
+#define YCT_FUNC_NAME __func__
 #else
 #define YCT_FUNC_NAME "YCT_TEST"
 #endif
@@ -235,8 +239,9 @@ struct yct_context {
     YCT_DUMP(); YCT_END(); return 0; }
 
 /* Internal prints */
-#define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (c)))
-#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", (str)))
+#define VNUT_YCT_FPUTC(c)((void)fprintf(p_yct_ctx_->out, "%c", (c)))
+#define VNUT_YCT_FPUTS(str) ((void)fprintf(p_yct_ctx_->out, "%s", \
+                                           (const char*)(str)))
 
 #define YCT_DUMP_SHORT()                                         \
     if (yct_main_ctx_.out != NULL) {                             \
