@@ -1,10 +1,12 @@
-// Check execution time the serial version and the parallel if you have at least
-// 2 CPUs. Compile the parallel enabling -DYCT_OPT_ENABLE_PARALLEL and /openmp
+/* Check execution time the serial version and the parallel if you have
+   at least 2 CPUs. Compile the parallel enabling -DYCT_OPT_ENABLE_PARALLEL
+   and /openmp
+*/
 
 #include <yacut.h>
 
 #ifndef N
-#define N (256 * 1024) // Tune this for your CPU speed
+#define N (256 * 1024) /* Tune this for your CPU speed */
 #endif
 
 
@@ -48,15 +50,15 @@ int main(void)
 {
     YCT_BEGIN("Parallel");
 
-    YCT_PARALLEL()
+    YCT_PARALLEL() /* Please note no semicolon on parallel directives */
     {
         YCT_SCHEDULE_TEST()
-        YCT_PARALLEL_TEST(pt1) // pt1 will run in parallel...
+        YCT_PARALLEL_TEST(pt1) /* pt1 will run in parallel... */
         YCT_JOIN_TEST()
         YCT_COLLECT_TEST_RESULTS()
 
         YCT_SCHEDULE_TEST()
-        YCT_PARALLEL_TEST(pt2) // ... with pt2
+        YCT_PARALLEL_TEST(pt2) /* ... with pt2 */
         YCT_JOIN_TEST()
         YCT_COLLECT_TEST_RESULTS()
     }

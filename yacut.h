@@ -346,7 +346,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 #ifndef YCT_OPT_ENABLE_PARALLEL
 #define YCT_PARALLEL()
 #define YCT_SCHEDULE_TEST()
-#define YCT_PARALLEL_TEST(yct_name) YCT_TEST_RUN(yct_name)
+#define YCT_PARALLEL_TEST(yct_name) YCT_TEST_RUN(yct_name);
 #define YCT_JOIN_TEST()
 #define YCT_COLLECT_TEST_RESULTS()
 #else
