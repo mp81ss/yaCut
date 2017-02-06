@@ -6,9 +6,10 @@
 #include <yacut.h>
 
 #ifndef N
-#define N (256 * 1024) /* Tune this for your CPU speed */
+#define N (128 * 1024) /* Tune this for your CPU speed */
 #endif
 
+static int activations = 0;
 
 static int is_prime(unsigned int n)
 {
@@ -31,6 +32,18 @@ static unsigned int core(unsigned int n)
     return t;
 }
 
+static void act(void)
+{
+    int a;
+
+    YCT_SYNCHRONIZED() /* No test, just custom code */
+    {
+        a = ++activations;
+        printf("Activation %d\n", a);
+    }
+
+    core(N);
+}
 
 YCT_TEST(pt1)
 {
@@ -44,6 +57,22 @@ YCT_TEST(pt2)
     const unsigned int r = core(N);
     YCT_ASSERT(r > 0);
     printf("%u\n", r);
+}
+
+YCT_TEST(parallel)
+{
+    YCT_PARALLEL()
+    {
+        YCT_GO()
+        act();
+        
+        YCT_GO()
+        {
+            act();
+        }
+    }
+
+    YCT_ASSERT_EQUAL(2, activations);
 }
 
 int main(void)
@@ -65,6 +94,13 @@ int main(void)
 
     YCT_DUMP();
 
+    YCT_END();
+
+    puts("\n");
+
+    YCT_BEGIN("Parallel 2"); /* Second context in same function */
+    YCT_TEST_RUN(parallel);
+    YCT_DUMP();
     YCT_END();
 
     return 0;

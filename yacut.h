@@ -10,8 +10,6 @@
 #ifndef YACUT_H_
 #define YACUT_H_
 
-#include <stdio.h>
-
 #define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (char)(c)))
 #define VNUT_YCT_FPUTS(str) \
     ((void)fprintf(p_yct_ctx_->out, "%s", (const char*)(str)))
@@ -30,7 +28,10 @@
 #endif
 
 #ifdef __cplusplus
+#include <cstdio>
 extern "C" {
+#else
+#include <stdio.h>
 #endif
 
 #ifndef YCT_FUNC_NAME
@@ -344,32 +345,41 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 
 /* Parallel */
 #ifndef YCT_OPT_ENABLE_PARALLEL
+
 #define YCT_PARALLEL()
 #define YCT_SCHEDULE_TEST()
 #define YCT_PARALLEL_TEST(yct_name) YCT_TEST_RUN(yct_name);
 #define YCT_JOIN_TEST()
 #define YCT_COLLECT_TEST_RESULTS()
+
+#define YCT_GO()
+#define YCT_SYNCHRONIZED()
+
 #else
 #pragma message("yaCut: PARALLEL ENABLED")
+
 #ifdef _MSC_VER
-#define YCT_PARALLEL() __pragma(omp parallel sections)
+#define YCT_PARALLEL()      __pragma(omp parallel sections)
 #define YCT_SCHEDULE_TEST() __pragma(omp section)
-#define YCT_JOIN_TEST() __pragma(omp critical)
+#define YCT_JOIN_TEST()     __pragma(omp critical)
 #else
-#define YCT_PARALLEL() _Pragma("omp parallel sections")
+#define YCT_PARALLEL()      _Pragma("omp parallel sections")
 #define YCT_SCHEDULE_TEST() _Pragma("omp section")
-#define YCT_JOIN_TEST() _Pragma("omp critical")
+#define YCT_JOIN_TEST()     _Pragma("omp critical")
 #endif
 
-#define YCT_PARALLEL_TEST(test_name) { VNUT_YCT_IF_OK {    \
-    struct yct_context yct_ctx_;                           \
-    VNUT_YCT_INIT_DATA(yct_ctx_);                          \
-    yct_ctx_.out = p_yct_ctx_->out;                        \
-    yct_ctx_.arg = p_yct_ctx_->arg;                        \
-    VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,   \
-                      VNUT_YCT_FLAGS_BLOCKING_MODE         \
-                      | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE  \
-                      | VNUT_YCT_FLAGS_LOG);               \
+#define YCT_GO()           YCT_SCHEDULE_TEST()
+#define YCT_SYNCHRONIZED() YCT_JOIN_TEST()
+
+#define YCT_PARALLEL_TEST(test_name) { VNUT_YCT_IF_OK {   \
+    struct yct_context yct_ctx_;                          \
+    VNUT_YCT_INIT_DATA(yct_ctx_);                         \
+    yct_ctx_.out = p_yct_ctx_->out;                       \
+    yct_ctx_.arg = p_yct_ctx_->arg;                       \
+    VNUT_YCT_COPY_BIT(p_yct_ctx_->flags, yct_ctx_.flags,  \
+                      VNUT_YCT_FLAGS_BLOCKING_MODE        \
+                      | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE \
+                      | VNUT_YCT_FLAGS_LOG);              \
     test_name(&yct_ctx_);
 
 #define YCT_COLLECT_TEST_RESULTS() {              \
@@ -406,15 +416,14 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
     const int vnut_yct_tests_ = p_yct_ctx_->tests > 0 ?                      \
                                                       p_yct_ctx_->tests : 1; \
     const int vnut_yct_passed_ = vnut_yct_tests_ - p_yct_ctx_->failed;       \
-    const char* vnut_yct_title_ = p_yct_ctx_->msg;                           \
-    if (vnut_yct_title_ != NULL && *vnut_yct_title_ != 0)                    \
-        vnut_yct_title_ = NULL;                                              \
+    if (p_yct_ctx_->msg != NULL && *p_yct_ctx_->msg == 0)                    \
+        p_yct_ctx_->msg = NULL;                                              \
     (void)fprintf(p_yct_ctx_->out, "\n------ %s v%d.%d Summary -----"        \
     "%s%s\nTests:      %d\nPassed:     %d\nFailed:     %d\nSuites:     %d\n" \
     "Messages:   %d\nWarnings:   %d\nAssertions: %d\nSuccess:    %.0f%%",    \
     YCT_GET_NAME(), YCT_VERSION_MAJOR(), YCT_VERSION_MINOR(),                \
-    vnut_yct_title_ != NULL ? "\nExecuting battery: " : "",                  \
-    vnut_yct_title_ != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_,         \
+    p_yct_ctx_->msg != NULL ? "\nExecuting battery: " : "",                  \
+    p_yct_ctx_->msg != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_,         \
     vnut_yct_passed_, p_yct_ctx_->failed, p_yct_ctx_->suites,                \
     p_yct_ctx_->messages, p_yct_ctx_->warnings,                              \
     p_yct_ctx_->checks - p_yct_ctx_->warnings,                               \
