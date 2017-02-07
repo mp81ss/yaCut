@@ -186,8 +186,8 @@ struct yct_context {
 #define VNUT_YCT_GET_START_TIME() (yct_main_ctx_.clocks = clock())
 #define VNUT_YCT_PRINT_ELAPSED_TIME() do {                                  \
     if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING) \
-        == 0) (void)fprintf(yct_main_ctx_.out, " (%.2f seconds)", (double)  \
-              (clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC);   \
+        == 0) (void)VNUT_YCT_FPRINTF(yct_main_ctx_.out, " (%.2f seconds)",  \
+        (double)(clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC); \
 } while (0)
 #endif
 
@@ -408,20 +408,20 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
     } } } }
 #endif
 
-#define YCT_DUMP_SHORT()                                         \
-    do { if (yct_main_ctx_.out != NULL) {                        \
-        if (yct_main_ctx_.failed > 0) {                          \
-            (void)fprintf(yct_main_ctx_.out, "%d FAILED\n",      \
-                          yct_main_ctx_.failed);                 \
-        }                                                        \
-        else {                                                   \
-            if (yct_main_ctx_.warnings > 0) {                    \
-                (void)fprintf(yct_main_ctx_.out, "%d WARNING\n", \
-                              yct_main_ctx_.warnings);           \
-            }                                                    \
-            else                                                 \
-                VNUT_YCT_FPUTS("ALL OK\n");                      \
-        }                                                        \
+#define YCT_DUMP_SHORT()                                                  \
+    do { if (yct_main_ctx_.out != NULL) {                                 \
+        if (yct_main_ctx_.failed > 0) {                                   \
+            (void)VNUT_YCT_FPRINTF(yct_main_ctx_.out, "%d FAILED\n",      \
+                          yct_main_ctx_.failed);                          \
+        }                                                                 \
+        else {                                                            \
+            if (yct_main_ctx_.warnings > 0) {                             \
+                (void)VNUT_YCT_FPRINTF(yct_main_ctx_.out, "%d WARNING\n", \
+                              yct_main_ctx_.warnings);                    \
+            }                                                             \
+            else                                                          \
+                VNUT_YCT_FPUTS("ALL OK\n");                               \
+        }                                                                 \
     } } while (0)
 
 #define YCT_DUMP()                                                           \
@@ -431,15 +431,15 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
     const int vnut_yct_passed_ = vnut_yct_tests_ - p_yct_ctx_->failed;       \
     if (p_yct_ctx_->msg != NULL && *p_yct_ctx_->msg == 0)                    \
         p_yct_ctx_->msg = NULL;                                              \
-    (void)fprintf(p_yct_ctx_->out, "\n------ %s v%d.%d Summary -----"        \
-    "%s%s\nTests:      %d\nPassed:     %d\nFailed:     %d\nSuites:     %d\n" \
-    "Messages:   %d\nWarnings:   %d\nAssertions: %d\nSuccess:    %.0f%%",    \
-    YCT_GET_NAME(), YCT_VERSION_MAJOR(), YCT_VERSION_MINOR(),                \
-    p_yct_ctx_->msg != NULL ? "\nExecuting battery: " : "",                  \
-    p_yct_ctx_->msg != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_,         \
-    vnut_yct_passed_, p_yct_ctx_->failed, p_yct_ctx_->suites,                \
-    p_yct_ctx_->messages, p_yct_ctx_->warnings,                              \
-    p_yct_ctx_->checks - p_yct_ctx_->warnings,                               \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out,                                  \
+    "\n------ %s v%d.%d Summary -----%s%s\nTests:      %d\nPassed:     %d\n" \
+    "Failed:     %d\nSuites:     %d\nMessages:   %d\nWarnings:   %d\n"       \
+    "Assertions: %d\nSuccess:    %.0f%%", YCT_GET_NAME(),                    \
+    YCT_VERSION_MAJOR(), YCT_VERSION_MINOR(), p_yct_ctx_->msg != NULL ?      \
+    "\nExecuting battery: " : "", p_yct_ctx_->msg != NULL ?                  \
+    p_yct_ctx_->msg : "", vnut_yct_tests_, vnut_yct_passed_,                 \
+    p_yct_ctx_->failed, p_yct_ctx_->suites, p_yct_ctx_->messages,            \
+    p_yct_ctx_->warnings, p_yct_ctx_->checks - p_yct_ctx_->warnings,         \
     (float)(vnut_yct_passed_ * 100) / (float)vnut_yct_tests_);               \
     VNUT_YCT_PRINT_ELAPSED_TIME(); if (p_yct_ctx_->failed > 0)               \
         VNUT_YCT_FPUTS("\n------> SOMETHING FAILED <-----\n");               \
@@ -455,22 +455,22 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
 static const char* vnut_yct_hex_chars_ = "0123456789ABCDEF";                 \
 const int vnut_yct_nibbles_ = (int)(sizeof(var) << 1);                       \
 int vnut_yct_i_, vnut_yct_started_ = 0;                                      \
-char vnut_yct_c_; fprintf(p_yct_ctx_->out, "0x");                            \
+char vnut_yct_c_; VNUT_YCT_FPRINTF(p_yct_ctx_->out, "0x");                   \
 for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
     vnut_yct_c_ = vnut_yct_hex_chars_[(((long)(var)) >> (vnut_yct_i_ << 2))  \
                                       & 0xF];                                \
     if (vnut_yct_started_ != 0 || vnut_yct_c_ != '0' || vnut_yct_i_ == 0) {  \
-        fprintf(p_yct_ctx_->out, "%c", vnut_yct_c_);                         \
+        VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", vnut_yct_c_);                \
         vnut_yct_started_ = 1; } } } while(0)
 
-#define VNUT_YCT_PRINT_MAIN(main_msg)                       \
-    do { if (p_yct_ctx_->out != NULL) {                     \
-        VNUT_YCT_FPUTS(__FILE__);                           \
-        (void)fprintf(p_yct_ctx_->out, ":%d: [", __LINE__); \
-        VNUT_YCT_FPUTS(YCT_FUNC_NAME);                      \
-        VNUT_YCT_FPUTS("]: ");                              \
-        VNUT_YCT_FPUTS(main_msg);                           \
-        VNUT_YCT_FPUTS(": ");                               \
+#define VNUT_YCT_PRINT_MAIN(main_msg)                                \
+    do { if (p_yct_ctx_->out != NULL) {                              \
+        VNUT_YCT_FPUTS(__FILE__);                                    \
+        (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, ":%d: [", __LINE__); \
+        VNUT_YCT_FPUTS(YCT_FUNC_NAME);                               \
+        VNUT_YCT_FPUTS("]: ");                                       \
+        VNUT_YCT_FPUTS(main_msg);                                    \
+        VNUT_YCT_FPUTS(": ");                                        \
     } } while (0)
 
 #define VNUT_YCT_PRINT(main_msg, cond) do { \
@@ -837,22 +837,22 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define VNUT_YCT_COMPARE_ARRAY(arr1, arr2, len, out) do { for (out = 0; \
     out < (unsigned int)(len) && arr1[out] == arr2[out]; out++) ; } while (0)
 
-#define YCT_ASSERT_EQUAL_ARRAY(expected, actual, len)                        \
-    do { VNUT_YCT_IF_OK {                                                    \
-        unsigned int vnut_yct_out_;                                          \
-        p_yct_ctx_->checks++;                                                \
-        VNUT_YCT_LOG(expected == actual);                                    \
-        VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), vnut_yct_out_);  \
-        if (vnut_yct_out_ < (unsigned int)(len)) {                           \
-            VNUT_YCT_PRINT("FAILED", #expected " == " #actual);              \
-            if (p_yct_ctx_->out != NULL) {                                   \
-                (void)fprintf(p_yct_ctx_->out,                               \
-                      ": 'Element [%u] was different'\n", vnut_yct_out_);    \
-            }                                                                \
-            p_yct_ctx_->failed = 1;                                          \
-            VNUT_YCT_IF_SET_BLOCKED();                                       \
-            VNUT_YCT_RETURN();                                               \
-        }                                                                    \
+#define YCT_ASSERT_EQUAL_ARRAY(expected, actual, len)                       \
+    do { VNUT_YCT_IF_OK {                                                   \
+        unsigned int vnut_yct_out_;                                         \
+        p_yct_ctx_->checks++;                                               \
+        VNUT_YCT_LOG(expected == actual);                                   \
+        VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), vnut_yct_out_); \
+        if (vnut_yct_out_ < (unsigned int)(len)) {                          \
+            VNUT_YCT_PRINT("FAILED", #expected " == " #actual);             \
+            if (p_yct_ctx_->out != NULL) {                                  \
+                (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out,                     \
+                      ": 'Element [%u] was different'\n", vnut_yct_out_);   \
+            }                                                               \
+            p_yct_ctx_->failed = 1;                                         \
+            VNUT_YCT_IF_SET_BLOCKED();                                      \
+            VNUT_YCT_RETURN();                                              \
+        }                                                                   \
     } } while (0)
 
 #define YCT_ASSERT_EQUAL_ARRAY_MSG(expected, actual, len, msg)               \
@@ -864,7 +864,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (vnut_yct_out_ < (unsigned int)(len)) {                           \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual);              \
             if (p_yct_ctx_->out != NULL) {                                   \
-                (void)fprintf(p_yct_ctx_->out,                               \
+                (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out,                      \
                       ": 'Element [%u] was different' { \"", vnut_yct_out_); \
                 VNUT_YCT_FPUTS(msg);                                         \
                 VNUT_YCT_FPUTS("\" }\n");                                    \

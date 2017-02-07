@@ -1,5 +1,7 @@
-2.0 ( JAN 2017)
+2.0 ( FEB 2017)
 
     Initial version
     Lot of improvements over v1
     Added support for log, timing and parallel features
+    Added support for parametric output function
+    Extra feature for parallel and timing support
