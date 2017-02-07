@@ -7,17 +7,31 @@
  *  http://opensource.org/licenses/BSD-3-Clause
  */
 
+
 #ifndef YACUT_H_
 #define YACUT_H_
 
-#define VNUT_YCT_FPUTC(c) ((void)fprintf(p_yct_ctx_->out, "%c", (char)(c)))
+#ifdef YCT_OPT_FPRINTF
+#define VNUT_YCT_FPRINTF YCT_OPT_FPRINTF
+#else
+#define VNUT_YCT_FPRINTF fprintf
+#endif
+
+#ifdef YCT_OPT_FWPRINTF
+#define VNUT_YCT_FWPRINTF YCT_OPT_FWPRINTF
+#else
+#define VNUT_YCT_FWPRINTF fwprintf
+#endif
+
+#define VNUT_YCT_FPUTC(c) \
+    ((void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", (char)(c)))
 #define VNUT_YCT_FPUTS(str) \
-    ((void)fprintf(p_yct_ctx_->out, "%s", (const char*)(str)))
+    ((void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%s", (const char*)(str)))
 
 #ifndef YCT_OPT_DISABLE_WCHAR
 #include <wchar.h>
 #define VNUT_YCT_FPUTWS(str) \
-    ((void)fwprintf(p_yct_ctx_->out, L"%s", (const wchar_t*)(str)))
+    ((void)VNUT_YCT_FWPRINTF(p_yct_ctx_->out, L"%s", (const wchar_t*)(str)))
 #else
 #define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
 #pragma message("yaCut: WCHAR DISABLED")
@@ -237,9 +251,6 @@ struct yct_context {
         if (sizeof(*(str)) < 2) VNUT_YCT_FPUTS(str); \
         else VNUT_YCT_FPUTWS(str); } } while (0)
 
-#define VNUT_YCT_PRINT_TEST(test_name) if (yct_ctx_.out != NULL) { \
-    VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTC('\n'); }
-
 #define VNUT_YCT_PRINT_END_NAME() do {                                      \
 if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
     && yct_ctx_.out != NULL) VNUT_YCT_FPUTC('\n'); } while (0)
@@ -255,7 +266,8 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
-        VNUT_YCT_PRINT_TEST(test_name);                                      \
+        if (yct_ctx_.out != NULL) {                                          \
+            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTC('\n'); }              \
         test_name(&yct_ctx_);                                                \
         p_yct_ctx_->tests++;                                                 \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                           \
@@ -283,7 +295,8 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE                \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
-        VNUT_YCT_PRINT_TEST(test_name);                                      \
+        if (yct_ctx_.out != NULL) { VNUT_YCT_FPUTS("  ");                    \
+            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTC('\n'); }              \
         if (f_setup_ != NULL)                                                \
             (*f_setup_)();                                                   \
         test_name(&yct_ctx_);                                                \
@@ -318,7 +331,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           VNUT_YCT_FLAGS_BLOCKING_MODE                   \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE            \
                           | VNUT_YCT_FLAGS_LOG);                         \
-        if (yct_ctx_.out != NULL) {                                      \
+        if (yct_ctx_.out != NULL) { VNUT_YCT_FPUTC('\n');                \
             VNUT_YCT_FPUTS(#suite_name); VNUT_YCT_FPUTS(" (suite)\n"); } \
         suite_name(&yct_ctx_);                                           \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,             \

@@ -32,19 +32,6 @@ static unsigned int core(unsigned int n)
     return t;
 }
 
-static void act(void)
-{
-    int a;
-
-    YCT_SYNCHRONIZED() /* No test, just custom code */
-    {
-        a = ++activations;
-        printf("Activation %d\n", a);
-    }
-
-    core(N);
-}
-
 YCT_TEST(pt1)
 {
     const unsigned int r = core(N);
@@ -59,20 +46,36 @@ YCT_TEST(pt2)
     printf("%u\n", r);
 }
 
-YCT_TEST(parallel)
+static void act(void)
 {
+    int a;
+
+    YCT_SYNCHRONIZED() /* Block executed serially, one thread at time */
+    {
+        a = ++activations;
+        printf("Activation %d\n", a);
+    }
+
+    core(N);
+}
+
+/* just a normal function */
+static void parallel(void)
+{
+    /* no semicolon on parallel directives! */
+
     YCT_PARALLEL()
     {
         YCT_GO()
-        act();
+        act(); /* This will run in parallel... */
         
         YCT_GO()
         {
-            act();
+            act(); /* ... with this */
         }
     }
 
-    YCT_ASSERT_EQUAL(2, activations);
+    printf("d activations\n", activations);
 }
 
 int main(void)
@@ -98,10 +101,8 @@ int main(void)
 
     puts("\n");
 
-    YCT_BEGIN("Parallel 2"); /* Second context in same function */
-    YCT_TEST_RUN(parallel);
-    YCT_DUMP();
-    YCT_END();
+    /* This is to demonstrate extra-yaCut parallel capabilities */
+    parallel();  
 
     return 0;
 }

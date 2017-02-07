@@ -37,6 +37,14 @@ This macro makes yaCut ignore <wchar.h> header. This means that you
 can still compare wchar_t variables, but yaCut will report them as "???".
 Use this macro for very old compilers that don't have support for <wchar.h>
 
+YCT_OPT_FPRINTF
+yaCut normally uses fprintf for ansi output. You can define this macro to
+instruct yaCut to use your own function (that must have the same prototype).
+
+YCT_OPT_FWPRINTF
+yaCut normally uses fwprintf for unicode output. You can define this macro to
+instruct yaCut to use your own function (that must have the same prototype).
+
 YCT_FUNC_NAME
 This is not a real parameter. This is the macro (if defined so) that the
 compilers offer to retrieve the current function name. It is needed by yaCut,
@@ -276,8 +284,9 @@ Disable time recording, execution time is not printed.
 
 
 SECTION: Parallel
-The parallel feature of yaCut allows the execution of multiple tests
-in parallel. Please note that tests should not write shared data.
+The parallel feature of yaCut allows the execution of multiple tests (or code)
+in parallel. Please note that tests should not write shared data. In this case
+yaCut provide the YCT_SYNCHRONIZED macro explained later.
 The number of tests really executed in parallel is equal to the physical
 number of cores available to the application.
 It relies on the OpenMP framework and it is disabled by default.
@@ -288,19 +297,30 @@ To get parallel tests execution, define YCT_OPT_ENABLE_PARALLEL before including
 yaCut and remember to compile/link with OpenMP support.
 Please note that even if your fprintf implementation is thread-safe, yaCut
 messages may be printed in pseudo random order, since each report is the result
-of several calls to fprintf. You should limit as much as possible the failures
-in these tests. Finally consider to prevent reports dumping using macro
-YCT_SET_OUTPUT (with NULL parameter).
+of several calls to fprintf. Finally consider that ALL parallel directives end
+WITHOUT semicolon.
 See code example ex_paral.c
 
 YCT_PARALLEL() { ... }
-Define a parallel tests context. All tests added with YCT_PARALLEL_TEST() will
-run in parallel.
+Define a parallel tests context. All tests added with YCT_PARALLEL_TEST() or
+other code inside YCT_GO macro will run in parallel.
+Can be used out of yaCut context (with YCT_GO macro).
+
+YCT_GO()
+Declare a block of code that will run in parallel with all other YCT_GO blocks
+declared inside a YCT_PARALLEL() block.
+Can be used out of yaCut context (inside YCT_PARALLEL macro).
+
+YCT_SYNCHRONIZED()
+Declare a block of code that will run sequentially, one thread at time. This
+is a synchronization directives. Can be used anywhere in your code.
 
 Since yaCut must use OpenMP macros in its macros, things get a little bit
 complicated. We have to declare 4 macros for each parallel test to execute
 in exact order. These macros have dummy name, they just replace code.
 The simplest way to explain them is through an example.
+All macros of this section are used in example file.
+Again, see file ex_paral.c
 
 
 -----------------------------------------------------------------------------
