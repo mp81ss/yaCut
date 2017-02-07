@@ -75,7 +75,7 @@ static void parallel(void)
         }
     }
 
-    printf("d activations\n", activations);
+    printf("%d activations\n", activations);
 }
 
 int main(void)
