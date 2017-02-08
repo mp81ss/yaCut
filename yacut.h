@@ -18,29 +18,6 @@ extern "C" {
 #include <stdio.h>
 #endif
 
-#ifdef YCT_OPT_JAILHOUSE
-
-#include <stdarg.h>
-#include <inmate.h>
-
-static int VNUT_YCT_jh_fprintf(FILE* stream, const char* format, ...) {
-    va_list args;
-    va_start(args, format);
-    printk(format, args);
-    va_end(args);
-    return 0;
-}
-
-static int VNUT_YCT_jh_fwprintf(FILE* stream, const wchar_t* format, ...) {
-    printk("???");
-    return 0;
-}
-
-#define VNUT_YCT_FPRINTF  VNUT_YCT_jh_fprintf
-#define VNUT_YCT_FWPRINTF VNUT_YCT_jh_fwprintf
-
-#else
-
 #ifdef YCT_OPT_FPRINTF
 #define VNUT_YCT_FPRINTF YCT_OPT_FPRINTF
 #else
@@ -51,8 +28,6 @@ static int VNUT_YCT_jh_fwprintf(FILE* stream, const wchar_t* format, ...) {
 #define VNUT_YCT_FWPRINTF YCT_OPT_FWPRINTF
 #else
 #define VNUT_YCT_FWPRINTF fwprintf
-#endif
-
 #endif
 
 #define VNUT_YCT_FPUTC(c) \
