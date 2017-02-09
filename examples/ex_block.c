@@ -84,12 +84,20 @@ static void show_full_blocking(void)
 
 int main(void)
 {
+    YCT_TIMER timer; /* unused warning if YCT_OPT_DISABLE_TIMING is defined */
+    float seconds = 0.0f;
+
+    YCT_START_TIMER(timer);
     show_blocking();
     assert(x == 2);
     show_full_blocking();
     assert(x == 2);
 
     puts("\nALL OK!");
+    YCT_STOP_TIMER(timer);
+    YCT_GET_TIME(timer, seconds);
 
+    printf("\nTime: %.2f seconds\n", seconds);
+    
     return x - 2;
 }

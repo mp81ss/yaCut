@@ -62,8 +62,16 @@ static void act(void)
 /* just a normal function */
 static void parallel(void)
 {
-    /* no semicolon on parallel directives! */
+#ifndef YCT_OPT_DISABLE_TIMING
+    YCT_TIMER t;
+    float seconds;
+#endif
 
+    /* Extra time functions offered by yaCut, no tests required */
+
+    YCT_START_TIMER(t);
+
+    /* no semicolon on parallel directives! */
     YCT_PARALLEL()
     {
         YCT_GO()
@@ -74,6 +82,12 @@ static void parallel(void)
             act(); /* ... with this */
         }
     }
+
+    YCT_STOP_TIMER(t);
+    YCT_GET_TIME(t, seconds);
+#ifndef YCT_OPT_DISABLE_TIMING
+    printf("Elapsed %.2f seconds\n", seconds);
+#endif
 
     printf("%d activations\n", activations);
 }

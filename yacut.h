@@ -18,6 +18,13 @@ extern "C" {
 #include <stdio.h>
 #endif
 
+#ifndef YCT_OPT_DISABLE_TIMING
+#include <time.h>
+#define YCT_TIMER clock_t
+#else
+#define YCT_TIMER int
+#endif
+
 #ifdef YCT_OPT_FPRINTF
 #define VNUT_YCT_FPRINTF YCT_OPT_FPRINTF
 #else
@@ -42,10 +49,6 @@ extern "C" {
 #else
 #define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
 #pragma message("yaCut: WCHAR DISABLED")
-#endif
-
-#ifndef YCT_OPT_DISABLE_TIMING
-#include <time.h>
 #endif
 
 #ifndef YCT_FUNC_NAME
@@ -84,7 +87,7 @@ struct yct_context {
     const char* msg;
     FILE* out;
 #ifndef YCT_OPT_DISABLE_TIMING
-    clock_t clocks;
+    YCT_TIMER clocks;
 #endif
     int suites;
     int messages;
@@ -177,17 +180,23 @@ struct yct_context {
 /* Timing */
 #ifdef YCT_OPT_DISABLE_TIMING
 #pragma message("yaCut: TIMING DISABLED")
+#define YCT_START_TIMER(t)
+#define YCT_STOP_TIMER(t)
+#define YCT_GET_TIME(t, f)
 #define YCT_DISABLE_TIMING()
 #define VNUT_YCT_GET_START_TIME()
 #define VNUT_YCT_PRINT_ELAPSED_TIME()
 #else
+#define YCT_START_TIMER(t) ((t) = clock())
+#define YCT_STOP_TIMER(t)  ((t) = clock() - (t))
+#define YCT_GET_TIME(t, f) ((f) = (float)(t) / (float)CLOCKS_PER_SEC)
 #define YCT_DISABLE_TIMING() \
     VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING)
-#define VNUT_YCT_GET_START_TIME() (yct_main_ctx_.clocks = clock())
+#define VNUT_YCT_GET_START_TIME() YCT_START_TIMER(yct_main_ctx_.clocks)
 #define VNUT_YCT_PRINT_ELAPSED_TIME() do {                                  \
     if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_DISABLED_TIMING) \
         == 0) (void)VNUT_YCT_FPRINTF(yct_main_ctx_.out, " (%.2f seconds)",  \
-        (double)(clock() - yct_main_ctx_.clocks) / (double)CLOCKS_PER_SEC); \
+        (float)(clock() - yct_main_ctx_.clocks) / (float)CLOCKS_PER_SEC);   \
 } while (0)
 #endif
 

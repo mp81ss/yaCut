@@ -277,7 +277,30 @@ It is enabled by default.
 See code example ex_block.c
 
 YCT_DISABLE_TIMING();
-Disable time recording, execution time is not printed.
+Disable time recording, execution time is not printed by YCT_DUMP macro.
+
+-- Extra Features
+
+If you compile with YCT_OPT_DISABLE_TIMING, compilation will go ok, but
+YCT_TIMER will be defined as int and your compiler will probably warn about
+unused variable. YCT_GET_TIME macro requires a float variable to store
+elapsed seconds. You can define the timer and the float var in a ifdef block
+(as shown in file ex_paral.c) to remove unused warning, leaving all other code
+unchanged.
+
+YCT_TIMER
+Macro that declares a timer. Use it to declare a timer. See following macros.
+
+YCT_START_TIMER(t)
+Start timer t previously declared with YCT_TIMER. A timer can be started
+multiple times, but will invalidate previous timer activations if any.
+
+YCT_STOP_TIMER(t)
+Stop timer t, typically activated by YCT_START_TIMER.
+
+YCT_GET_TIME(t, f)
+Put elapsed time stored in timer t in the float variable f. Variable f will
+contain the elapsed time in seconds.
 
 
 -----------------------------------------------------------------------------
@@ -306,6 +329,14 @@ Define a parallel tests context. All tests added with YCT_PARALLEL_TEST() or
 other code inside YCT_GO macro will run in parallel.
 Can be used out of yaCut context (with YCT_GO macro).
 
+Since yaCut must use OpenMP macros in its macros, things get a little bit
+complicated. We have to declare 4 macros for each parallel test to execute
+in exact order. These macros have dummy name, they just replace code.
+The simplest way to explain them is through an example.
+All macros of this section are used in example file ex_paral.c
+
+-- Extra Features
+
 YCT_GO()
 Declare a block of code that will run in parallel with all other YCT_GO blocks
 declared inside a YCT_PARALLEL() block.
@@ -314,13 +345,6 @@ Can be used out of yaCut context (inside YCT_PARALLEL macro).
 YCT_SYNCHRONIZED()
 Declare a block of code that will run sequentially, one thread at time. This
 is a synchronization directives. Can be used anywhere in your code.
-
-Since yaCut must use OpenMP macros in its macros, things get a little bit
-complicated. We have to declare 4 macros for each parallel test to execute
-in exact order. These macros have dummy name, they just replace code.
-The simplest way to explain them is through an example.
-All macros of this section are used in example file.
-Again, see file ex_paral.c
 
 
 -----------------------------------------------------------------------------
