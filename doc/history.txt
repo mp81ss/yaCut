@@ -5,3 +5,4 @@
     Added support for log, timing and parallel features
     Added support for parametric output function
     Extra feature for parallel and timing support
+    Added support for jailhouse

@@ -28,17 +28,25 @@ extern "C" {
 #ifdef YCT_OPT_FPRINTF
 #define VNUT_YCT_FPRINTF YCT_OPT_FPRINTF
 #else
+#ifdef YCT_OPT_JAILHOUSE
+#include <inmate.h>
+#define VNUT_YCT_FPRINTF(s, f, ...) printk((f), __VA_ARGS__)
+#else
 #define VNUT_YCT_FPRINTF fprintf
+#endif
 #endif
 
 #ifdef YCT_OPT_FWPRINTF
 #define VNUT_YCT_FWPRINTF YCT_OPT_FWPRINTF
 #else
+#ifdef YCT_OPT_JAILHOUSE
+#include <inmate.h>
+#define VNUT_YCT_FWPRINTF(s, f, ...) printk("???")
+#else
 #define VNUT_YCT_FWPRINTF fwprintf
 #endif
+#endif
 
-#define VNUT_YCT_FPUTC(c) \
-    ((void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", (char)(c)))
 #define VNUT_YCT_FPUTS(str) \
     ((void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%s", (const char*)(str)))
 
@@ -262,7 +270,7 @@ struct yct_context {
 
 #define VNUT_YCT_PRINT_END_NAME() do {                                      \
 if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
-    && yct_ctx_.out != NULL) VNUT_YCT_FPUTC('\n'); } while (0)
+    && yct_ctx_.out != NULL) VNUT_YCT_FPUTS("\n"); } while (0)
 
 #define YCT_TEST_RUN(test_name)                                              \
     do { VNUT_YCT_IF_OK {                                                    \
@@ -276,7 +284,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
         if (yct_ctx_.out != NULL) {                                          \
-            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTC('\n'); }              \
+            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTS("\n"); }              \
         test_name(&yct_ctx_);                                                \
         p_yct_ctx_->tests++;                                                 \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                           \
@@ -305,7 +313,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           | VNUT_YCT_FLAGS_LOG);                             \
         VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_FAILED);   \
         if (yct_ctx_.out != NULL) { VNUT_YCT_FPUTS("  ");                    \
-            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTC('\n'); }              \
+            VNUT_YCT_FPUTS(#test_name); VNUT_YCT_FPUTS("\n"); }              \
         if (f_setup_ != NULL)                                                \
             (*f_setup_)();                                                   \
         test_name(&yct_ctx_);                                                \
@@ -340,7 +348,7 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
                           VNUT_YCT_FLAGS_BLOCKING_MODE                   \
                           | VNUT_YCT_FLAGS_FULL_BLOCKING_MODE            \
                           | VNUT_YCT_FLAGS_LOG);                         \
-        if (yct_ctx_.out != NULL) { VNUT_YCT_FPUTC('\n');                \
+        if (yct_ctx_.out != NULL) { VNUT_YCT_FPUTS("\n");                \
             VNUT_YCT_FPUTS(#suite_name); VNUT_YCT_FPUTS(" (suite)\n"); } \
         suite_name(&yct_ctx_);                                           \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,             \
@@ -436,27 +444,38 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 #define YCT_DUMP()                                                           \
 do { if (p_yct_ctx_->out != NULL) {                                          \
     const int vnut_yct_tests_ = p_yct_ctx_->tests > 0 ?                      \
-                                                      p_yct_ctx_->tests : 1; \
+                                p_yct_ctx_->tests : 1;                       \
     const int vnut_yct_passed_ = vnut_yct_tests_ - p_yct_ctx_->failed;       \
     if (p_yct_ctx_->msg != NULL && *p_yct_ctx_->msg == 0)                    \
         p_yct_ctx_->msg = NULL;                                              \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out,                                  \
-    "\n------ %s v%d.%d Summary -----%s%s\nTests:      %d\nPassed:     %d\n" \
-    "Failed:     %d\nSuites:     %d\nMessages:   %d\nWarnings:   %d\n"       \
-    "Assertions: %d\nSuccess:    %.0f%%", YCT_GET_NAME(),                    \
-    YCT_VERSION_MAJOR(), YCT_VERSION_MINOR(), p_yct_ctx_->msg != NULL ?      \
-    "\nExecuting battery: " : "", p_yct_ctx_->msg != NULL ?                  \
-    p_yct_ctx_->msg : "", vnut_yct_tests_, vnut_yct_passed_,                 \
-    p_yct_ctx_->failed, p_yct_ctx_->suites, p_yct_ctx_->messages,            \
-    p_yct_ctx_->warnings, p_yct_ctx_->checks - p_yct_ctx_->warnings,         \
-    (float)(vnut_yct_passed_ * 100) / (float)vnut_yct_tests_);               \
-    VNUT_YCT_PRINT_ELAPSED_TIME(); if (p_yct_ctx_->failed > 0)               \
-        VNUT_YCT_FPUTS("\n------> SOMETHING FAILED <-----\n");               \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "\n------- %s v%d.%d Summary",   \
+    YCT_GET_NAME(), YCT_VERSION_MAJOR(), YCT_VERSION_MINOR());               \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, " ------%s%s\nTests:        %d", \
+    p_yct_ctx_->msg != NULL ? "\nExecuting battery: " : "",                  \
+    p_yct_ctx_->msg != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_);        \
+    VNUT_YCT_FPUTS("\n");                                                    \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Passed:       %d\n",            \
+    vnut_yct_passed_);                                                       \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Failed:       %d\n",            \
+    p_yct_ctx_->failed);                                                     \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Suites:       %d\n",            \
+    p_yct_ctx_->suites);                                                     \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Messages:     %d\n",            \
+    p_yct_ctx_->messages);                                                   \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Warnings:     %d\n",            \
+    p_yct_ctx_->warnings);                                                   \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Assertions:   %d\n",            \
+    p_yct_ctx_->checks - p_yct_ctx_->warnings);                              \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Success:      %d",              \
+    (100 * vnut_yct_passed_) / vnut_yct_tests_); VNUT_YCT_FPUTS("%");        \
+    VNUT_YCT_PRINT_ELAPSED_TIME();                                           \
+    if (p_yct_ctx_->failed > 0)                                              \
+        VNUT_YCT_FPUTS("\n-------> SOMETHING FAILED <------\n");             \
     else {                                                                   \
         if (p_yct_ctx_->warnings > 0)                                        \
-            VNUT_YCT_FPUTS("\n-------> SOME WARNING <--------\n");           \
+            VNUT_YCT_FPUTS("\n---------> SOME WARNING <--------\n");         \
         else                                                                 \
-            VNUT_YCT_FPUTS("\n----------> ALL OK <-----------\n");           \
+            VNUT_YCT_FPUTS("\n------------> ALL OK <-----------\n");         \
     }                                                                        \
 } } while (0)
 
@@ -485,9 +504,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define VNUT_YCT_PRINT(main_msg, cond) do { \
     VNUT_YCT_PRINT_MAIN(main_msg);          \
     if (p_yct_ctx_->out != NULL) {          \
-        VNUT_YCT_FPUTC('(');                \
+        VNUT_YCT_FPUTS("(");                \
         VNUT_YCT_FPUTS(cond);               \
-        VNUT_YCT_FPUTC(')');                \
+        VNUT_YCT_FPUTS(")");                \
     }                                       \
 } while (0)
 
@@ -507,7 +526,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
     do { if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LOG)) { \
         VNUT_YCT_PRINT("LOG", #cond);                                   \
         if (p_yct_ctx_->out != NULL)                                    \
-            VNUT_YCT_FPUTC('\n');                                       \
+            VNUT_YCT_FPUTS("\n");                                       \
     } } while (0)
 #endif
 
@@ -534,7 +553,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             p_yct_ctx_->warnings++;                                         \
             VNUT_YCT_PRINT("WARNING", #cond);                               \
             if (p_yct_ctx_->out != NULL)                                    \
-                VNUT_YCT_FPUTC('\n');                                       \
+                VNUT_YCT_FPUTS("\n");                                       \
             if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,                         \
                                  VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0)   \
             {                                                               \
@@ -578,7 +597,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_PRINT("FAILED", #cond); \
             p_yct_ctx_->failed = 1;          \
             if (p_yct_ctx_->out != NULL)     \
-                VNUT_YCT_FPUTC('\n');        \
+                VNUT_YCT_FPUTS("\n");        \
             VNUT_YCT_IF_SET_BLOCKED();       \
             VNUT_YCT_RETURN();               \
         }                                    \
@@ -679,7 +698,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if ((var) != NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
-                VNUT_YCT_FPUTC('(');           \
+                VNUT_YCT_FPUTS("(");           \
                 VNUT_YCT_FPUTS(#var);          \
                 VNUT_YCT_FPUTS(" == NULL)\n"); \
             }                                  \
@@ -696,7 +715,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if ((var) != NULL) {                      \
             VNUT_YCT_PRINT_MAIN("FAILED");        \
             if (p_yct_ctx_->out != NULL) {        \
-                VNUT_YCT_FPUTC('(');              \
+                VNUT_YCT_FPUTS("(");              \
                 VNUT_YCT_FPUTS(#var);             \
                 VNUT_YCT_FPUTS(" == NULL) { \""); \
                 VNUT_YCT_FPUTS(msg);              \
@@ -715,7 +734,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if ((var) == NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
             if (p_yct_ctx_->out != NULL) {     \
-                VNUT_YCT_FPUTC('(');           \
+                VNUT_YCT_FPUTS("(");           \
                 VNUT_YCT_FPUTS(#var);          \
                 VNUT_YCT_FPUTS(" != NULL)\n"); \
             }                                  \
@@ -732,7 +751,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if ((var) == NULL) {                \
             VNUT_YCT_PRINT_MAIN("FAILED");  \
             if (p_yct_ctx_->out != NULL) {  \
-                VNUT_YCT_FPUTC('(');        \
+                VNUT_YCT_FPUTS("(");        \
                 VNUT_YCT_FPUTS(#var);       \
                 VNUT_YCT_FPUTS(" != NULL"); \
                 VNUT_YCT_FPUTS(") { \"");   \
@@ -893,7 +912,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (vnut_yct_out_ == (unsigned int)(len)) {                   \
             VNUT_YCT_PRINT("FAILED", #arr1 " != " #arr2);             \
             if (p_yct_ctx_->out != NULL)                              \
-                VNUT_YCT_FPUTC('\n');                                 \
+                VNUT_YCT_FPUTS("\n");                                 \
             p_yct_ctx_->failed = 1;                                   \
             VNUT_YCT_IF_SET_BLOCKED();                                \
             VNUT_YCT_RETURN();                                        \
@@ -921,7 +940,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (fcmp(&expected, &actual) != 0) {         \
             VNUT_YCT_PRINT_MAIN("FAILED");           \
             if (p_yct_ctx_->out != NULL) {           \
-                VNUT_YCT_FPUTC('(');                 \
+                VNUT_YCT_FPUTS("(");                 \
                 VNUT_YCT_FPUTS(#expected);           \
                 VNUT_YCT_FPUTS(" == ");              \
                 VNUT_YCT_FPUTS(#actual);             \
@@ -940,7 +959,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (fcmp(&expected, &actual) != 0) {                  \
             VNUT_YCT_PRINT_MAIN("FAILED");                    \
             if (p_yct_ctx_->out != NULL) {                    \
-                VNUT_YCT_FPUTC('(');                          \
+                VNUT_YCT_FPUTS("(");                          \
                 VNUT_YCT_FPUTS(#expected);                    \
                 VNUT_YCT_FPUTS(" == ");                       \
                 VNUT_YCT_FPUTS(#actual);                      \
@@ -961,7 +980,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (fcmp(&obj1, &obj2) == 0) {             \
             VNUT_YCT_PRINT_MAIN("FAILED");         \
             if (p_yct_ctx_->out != NULL) {         \
-                VNUT_YCT_FPUTC('(');               \
+                VNUT_YCT_FPUTS("(");               \
                 VNUT_YCT_FPUTS(#obj1);             \
                 VNUT_YCT_FPUTS(" != ");            \
                 VNUT_YCT_FPUTS(#obj2);             \
@@ -980,7 +999,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (fcmp(&obj1, &obj2) == 0) {                      \
             VNUT_YCT_PRINT_MAIN("FAILED");                  \
             if (p_yct_ctx_->out != NULL) {                  \
-                VNUT_YCT_FPUTC('(');                        \
+                VNUT_YCT_FPUTS("(");                        \
                 VNUT_YCT_FPUTS(#obj1);                      \
                 VNUT_YCT_FPUTS(" != ");                     \
                 VNUT_YCT_FPUTS(#obj2);                      \
@@ -1001,7 +1020,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (VNUT_YCT_ABS((expected_float) - (actual_float)) > tolerance) {  \
             VNUT_YCT_PRINT("FAILED", #expected_float " == " #actual_float); \
             if (p_yct_ctx_->out != NULL)                                    \
-                VNUT_YCT_FPUTC('\n');                                       \
+                VNUT_YCT_FPUTS("\n");                                       \
             p_yct_ctx_->failed = 1;                                         \
             VNUT_YCT_IF_SET_BLOCKED();                                      \
             VNUT_YCT_RETURN();                                              \
@@ -1027,7 +1046,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         if (VNUT_YCT_ABS((a) - (b)) > t) { ; } else { \
             VNUT_YCT_PRINT("FAILED", #a " != " #b);   \
             if (p_yct_ctx_->out != NULL)              \
-                VNUT_YCT_FPUTC('\n');                 \
+                VNUT_YCT_FPUTS("\n");                 \
             p_yct_ctx_->failed = 1;                   \
             VNUT_YCT_IF_SET_BLOCKED();                \
             VNUT_YCT_RETURN();                        \
