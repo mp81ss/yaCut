@@ -1,7 +1,7 @@
                                 YACUT v2.0 manual
 
 This file describes the usage of the yacut C testing framework.
-It is just a single ANSI C header, just include it and compile.
+It is just a single C header, just include it and compile.
 The macro YCT_VERSION_MAJOR() is and ALWAYS will be present. This is the
 standard way to detect yaCut (and its version, see also YCT_VERSION_MINOR()).
 It is heavily based on preprocessor macros, see examples to get started with
