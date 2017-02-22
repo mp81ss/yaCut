@@ -55,7 +55,7 @@ extern "C" {
 #define VNUT_YCT_FPUTWS(str) \
     ((void)VNUT_YCT_FWPRINTF(p_yct_ctx_->out, L"%s", (const wchar_t*)(str)))
 #else
-#define VNUT_YCT_FPUTWS(str) VNUT_YCT_FPUTS("???")
+#define VNUT_YCT_FPUTWS(str) ((void)VNUT_YCT_FPUTS("???"))
 #pragma message("yaCut: WCHAR DISABLED")
 #endif
 
@@ -262,10 +262,10 @@ struct yct_context {
 #define YCT_SET_PARAMETER(par) (p_yct_ctx_->arg = (void*)(par))
 #define YCT_PARAMETER (p_yct_ctx_->arg)
 
-#define VNUT_YCT_PRINT_STR_VAR(str) do {             \
-    if ((str) == NULL) VNUT_YCT_FPUTS("NULL");       \
-    else {                                           \
-        if (sizeof(*(str)) < 2) VNUT_YCT_FPUTS(str); \
+#define VNUT_YCT_PRINT_STR_VAR(str) do {                 \
+    if ((str) == NULL) { (void)VNUT_YCT_FPUTS("NULL"); } \
+    else {                                               \
+        if (sizeof(*(str)) < 2) VNUT_YCT_FPUTS(str);     \
         else VNUT_YCT_FPUTWS(str); } } while (0)
 
 #define VNUT_YCT_PRINT_END_NAME() do {                                      \
@@ -483,12 +483,12 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
 static const char* vnut_yct_hex_chars_ = "0123456789ABCDEF";                 \
 const int vnut_yct_nibbles_ = (int)(sizeof(var) << 1);                       \
 int vnut_yct_i_, vnut_yct_started_ = 0;                                      \
-char vnut_yct_c_; VNUT_YCT_FPRINTF(p_yct_ctx_->out, "0x");                   \
+char vnut_yct_c_; (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "0x");             \
 for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
     vnut_yct_c_ = vnut_yct_hex_chars_[(((long)(var)) >> (vnut_yct_i_ << 2))  \
                                       & 0xF];                                \
     if (vnut_yct_started_ != 0 || vnut_yct_c_ != '0' || vnut_yct_i_ == 0) {  \
-        VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", vnut_yct_c_);                \
+        (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", vnut_yct_c_);          \
         vnut_yct_started_ = 1; } } } while(0)
 
 #define VNUT_YCT_PRINT_MAIN(main_msg)                                \
