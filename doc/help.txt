@@ -39,8 +39,9 @@ Use this macro for very old compilers that don't have support for <wchar.h>
 
 YCT_OPT_JAILHOUSE
 Enable jailhouse mode. Define this macro when using yaCut with jailhouse.
-Since there's no clock() function to measure time, you should define the
-YCT_OPT_DISABLE_TIMING macro, otherwise U.B./crashes may happen.
+May be useful to set the YCT_OPT_DISABLE_TIMING macro.
+If your environment allow file printing, you should redefine the
+YCT_OPT_F[W]PRINTF macros instead of using the YCT_OPT_JAILHOUSE macro.
 
 YCT_OPT_FPRINTF
 yaCut normally uses fprintf for ansi output. You can define this macro to
