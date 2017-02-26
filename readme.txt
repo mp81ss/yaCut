@@ -3,8 +3,8 @@ yaCut v2.0
 Yet Another C "Unit" Test framework
 
 - Single header, ready to use
-- Very fast (no system call or complex operations)
-- Highly Portable (C99, 16/32/64bit support, windows/nix/bsd)
+- Very fast (no complex operations)
+- Highly Portable (16/32/64bit support, windows/nix/bsd)
 - Follow xUnit architecture
 - Support Messages, Warnings and Assertions
 - Lot of assertions (values, floating point, strings, arrays, objects)
@@ -15,6 +15,7 @@ Yet Another C "Unit" Test framework
 - Detailed and short result display
 - Batch mode support (parametric output + error code)
 - Unicode aware
+- Jailhouse support
 - Free (BSD-license, see file LICENSE for details)
 
 
