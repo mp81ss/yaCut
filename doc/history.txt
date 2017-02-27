@@ -1,4 +1,4 @@
-2.0 ( FEB 2017)
+2.0 (25 FEB 2017)
 
     Initial version
     Lot of improvements over v1

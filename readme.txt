@@ -13,8 +13,11 @@ Yet Another C "Unit" Test framework
 - Disabling/enabling (skip) test/suites in several ways
 - Blocking behaviour configurable on assertions and even warnings failure
 - Detailed and short result display
+- Log support for every assertion
+- Timing facilities to profile (yaCut context, test or user defined code)
 - Batch mode support (parametric output + error code)
 - Unicode aware
+- Parallel support (both test and user defined code)
 - Jailhouse support
 - Free (BSD-license, see file LICENSE for details)
 
