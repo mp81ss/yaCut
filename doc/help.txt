@@ -76,6 +76,9 @@ Present in ALL versions of yaCut, use this macro to detect yaCut presence.
 YCT_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
+YCT_VERSION_RELEASE();
+Returns an integer representing the release version of the library.
+
 YCT_SET_OUTPUT(handle);
 Set the output handle. The default is stdout. You can pass your FILE* variable.
 This macro is to be used in a main context. If you want to change the output
@@ -351,6 +354,16 @@ Can be used out of yaCut context (inside YCT_PARALLEL macro).
 YCT_SYNCHRONIZED()
 Declare a block of code that will run sequentially, one thread at time. This
 is a synchronization directives. Can be used anywhere in your code.
+
+YCT_ATOMIC()
+Allow simple operations (increments/decrements, may be other) to be performed
+atomically. The advantage is that is much more efficient than the
+YCT_SYNCHRONIZED macro.
+N.B.: Refer to your OpenMP specification to check what operations you can do
+with this macro.  
+
+YCT_BARRIER()
+Make all threads wait to barrier until ALL threads reach it.
 
 
 -----------------------------------------------------------------------------

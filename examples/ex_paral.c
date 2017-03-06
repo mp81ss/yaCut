@@ -2,7 +2,6 @@
    at least 2 CPUs. Compile the parallel enabling -DYCT_OPT_ENABLE_PARALLEL
    and /openmp
 */
-
 #include <yacut.h>
 
 #ifndef N
@@ -48,13 +47,12 @@ YCT_TEST(pt2)
 
 static void act(void)
 {
-    int a;
-
     YCT_SYNCHRONIZED() /* Block executed serially, one thread at time */
     {
-        a = ++activations;
-        printf("Activation %d\n", a);
+        printf("Activation %d\n", ++activations);
     }
+
+    /* Note: For increments/decrements see YCT_ATOMIC() doc! */
 
     core(N);
 }

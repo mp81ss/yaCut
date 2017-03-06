@@ -86,9 +86,10 @@ extern "C" {
 #define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40
 #define VNUT_YCT_FLAGS_LAST_FAILED          0x80
 
-#define YCT_GET_NAME()      "yaCut"
-#define YCT_VERSION_MAJOR() 2
-#define YCT_VERSION_MINOR() 0
+#define YCT_GET_NAME()          "yaCut"
+#define YCT_VERSION_MAJOR()     2
+#define YCT_VERSION_MINOR()     0
+#define YCT_VERSION_RELEASE()   2
 
 struct yct_context {
     void* arg;
@@ -384,6 +385,8 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 
 #define YCT_GO()
 #define YCT_SYNCHRONIZED()
+#define YCT_ATOMIC()
+#define YCT_BARRIER()
 
 #else
 #pragma message("yaCut: PARALLEL ENABLED")
@@ -392,10 +395,14 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 #define YCT_PARALLEL()      __pragma(omp parallel sections)
 #define YCT_SCHEDULE_TEST() __pragma(omp section)
 #define YCT_JOIN_TEST()     __pragma(omp critical)
+#define YCT_ATOMIC()        __pragma(omp atomic)
+#define YCT_BARRIER()       __pragma(omp barrier)
 #else
 #define YCT_PARALLEL()      _Pragma("omp parallel sections")
 #define YCT_SCHEDULE_TEST() _Pragma("omp section")
 #define YCT_JOIN_TEST()     _Pragma("omp critical")
+#define YCT_ATOMIC()        _Pragma("omp atomic")
+#define YCT_BARRIER()       _Pragma("omp barrier")
 #endif
 
 #define YCT_GO()           YCT_SCHEDULE_TEST()
@@ -480,12 +487,12 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
 } } while (0)
 
 #define VNUT_YCT_PRINT_VAR(var) do {                                         \
-static const char* vnut_yct_hex_chars_ = "0123456789ABCDEF";                 \
+static const char* vnut_yct_hexes_ = "0123456789ABCDEF";                     \
 const int vnut_yct_nibbles_ = (int)(sizeof(var) << 1);                       \
 int vnut_yct_i_, vnut_yct_started_ = 0;                                      \
 char vnut_yct_c_; (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "0x");             \
 for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
-    vnut_yct_c_ = vnut_yct_hex_chars_[(((long)(var)) >> (vnut_yct_i_ << 2))  \
+    vnut_yct_c_ = vnut_yct_hexes[(((size_t)(var)) >> (vnut_yct_i_ << 2))     \
                                       & 0xF];                                \
     if (vnut_yct_started_ != 0 || vnut_yct_c_ != '0' || vnut_yct_i_ == 0) {  \
         (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", vnut_yct_c_);          \
