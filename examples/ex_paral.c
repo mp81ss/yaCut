@@ -47,12 +47,14 @@ YCT_TEST(pt2)
 
 static void act(void)
 {
+    /* Atomic increment, much more faster than YCT_SYNCHRONIZED */
+    YCT_ATOMIC()
+    activations++;
+
     YCT_SYNCHRONIZED() /* Block executed serially, one thread at time */
     {
-        printf("Activation %d\n", ++activations);
+        printf("Activation %d\n", activations);
     }
-
-    /* Note: For increments/decrements see YCT_ATOMIC() doc! */
 
     core(N);
 }
