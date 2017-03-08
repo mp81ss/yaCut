@@ -622,6 +622,35 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         }                                             \
     } } while (0)
 
+#define YCT_ASSERT_TRUE(cond) YCT_ASSERT(cond)
+#define YCT_ASSERT_TRUE_MSG(cond) YCT_ASSERT_MSG(cond)
+
+#define YCT_ASSERT_FALSE(cond)               \
+    do { VNUT_YCT_IF_OK {                    \
+        p_yct_ctx_->checks++;                \
+        VNUT_YCT_LOG(cond);                  \
+        if (cond) {                          \
+            VNUT_YCT_PRINT("FAILED", #cond); \
+            p_yct_ctx_->failed = 1;          \
+            if (p_yct_ctx_->out != NULL)     \
+                VNUT_YCT_FPUTS("\n");        \
+            VNUT_YCT_IF_SET_BLOCKED();       \
+            VNUT_YCT_RETURN();               \
+        }                                    \
+    } } while (0)
+
+#define YCT_ASSERT_FALSE_MSG(cond, msg)               \
+    do { VNUT_YCT_IF_OK {                             \
+        p_yct_ctx_->checks++;                         \
+        VNUT_YCT_LOG(cond);                           \
+        if (cond) {                                   \
+            VNUT_YCT_PRINT_MSG("FAILED", #cond, msg); \
+            p_yct_ctx_->failed = 1;                   \
+            VNUT_YCT_IF_SET_BLOCKED();                \
+            VNUT_YCT_RETURN();                        \
+        }                                             \
+    } } while (0)
+
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     do { VNUT_YCT_IF_OK {                                       \
         p_yct_ctx_->checks++;                                   \
