@@ -129,9 +129,9 @@ No return value is allowed. To be used in global scope.
 YCT_TEST_RUN(test);
 Run the test test. To be used in YCT_BEGIN/YCT_END context.
 
-YCT_MAIN(test_or_suite);
+YCT_MAIN(test_or_suite)
 This macro defines a custom main so you must not write your own. The parameter
-must be a defined test or suite to be run.
+must be a defined test or suite to be run. No semicolon follows.
 Note that a single entry test/suite is not a limit (see YCT_BEGIN notes).
 
 YCT_SET_PARAMETER(arg);

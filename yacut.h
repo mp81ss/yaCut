@@ -492,7 +492,7 @@ const int vnut_yct_nibbles_ = (int)(sizeof(var) << 1);                       \
 int vnut_yct_i_, vnut_yct_started_ = 0;                                      \
 char vnut_yct_c_; (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "0x");             \
 for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
-    vnut_yct_c_ = vnut_yct_hexes[(((size_t)(var)) >> (vnut_yct_i_ << 2))     \
+    vnut_yct_c_ = vnut_yct_hexes_[(((size_t)(var)) >> (vnut_yct_i_ << 2))    \
                                       & 0xF];                                \
     if (vnut_yct_started_ != 0 || vnut_yct_c_ != '0' || vnut_yct_i_ == 0) {  \
         (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "%c", vnut_yct_c_);          \
