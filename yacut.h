@@ -396,13 +396,11 @@ if ((yct_ctx_.failed > 0 || yct_ctx_.warnings > 0 || yct_ctx_.messages > 0) \
 #define YCT_SCHEDULE_TEST() __pragma(omp section)
 #define YCT_JOIN_TEST()     __pragma(omp critical)
 #define YCT_ATOMIC()        __pragma(omp atomic)
-#define YCT_BARRIER()       __pragma(omp barrier)
 #else
 #define YCT_PARALLEL()      _Pragma("omp parallel sections")
 #define YCT_SCHEDULE_TEST() _Pragma("omp section")
 #define YCT_JOIN_TEST()     _Pragma("omp critical")
 #define YCT_ATOMIC()        _Pragma("omp atomic")
-#define YCT_BARRIER()       _Pragma("omp barrier")
 #endif
 
 #define YCT_GO()           YCT_SCHEDULE_TEST()
@@ -624,6 +622,8 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_TRUE(cond) YCT_ASSERT(cond)
 #define YCT_ASSERT_TRUE_MSG(cond) YCT_ASSERT_MSG(cond)
+#define YCT_ASSERT_ONE(cond) YCT_ASSERT(cond)
+#define YCT_ASSERT_ONE_MSG(cond) YCT_ASSERT_MSG(cond)
 
 #define YCT_ASSERT_FALSE(cond)               \
     do { VNUT_YCT_IF_OK {                    \
@@ -650,6 +650,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_RETURN();                        \
         }                                             \
     } } while (0)
+
+#define YCT_ASSERT_ZERO(cond) YCT_ASSERT_FALSE(cond)
+#define YCT_ASSERT_ZERO_MSG(cond) YCT_ASSERT_fALSE_MSG(cond)
 
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     do { VNUT_YCT_IF_OK {                                       \

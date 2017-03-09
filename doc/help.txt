@@ -386,18 +386,30 @@ YCT_MESSAGE(message);
 Write message on output stream.
 
 YCT_WARNING(condition);
-Issue a warning if condition is false.
+Issue a warning if condition is false (zero).
 
 YCT_FAIL(message);
 Abort current test and writes message.
 
 YCT_ASSERT(condition);
-Abort current test if condition fails.
+Abort current test if condition fails (zero).
 
 YCT_ASSERT_MSG(condition, message);
 Abort current test and write message if condition fails. All assertions below
 have the_MSG version too, like this. Just add _MSG to macro name and add the
-message as last parameter.
+message as last parameter. Must be a string, char* or literal.
+
+YCT_ASSERT_ZERO(condition);
+Abort current test if condition doesn't return 0.
+
+YCT_ASSERT_ONE(condition);
+Abort current test if condition doesn't return 1.
+
+YCT_ASSERT_TRUE(condition);
+See YCT_ASSERT_ONE.
+
+YCT_ASSERT_FALSE(condition);
+See YCT_ASSERT_ZERO.
 
 YCT_ASSERT_EQUAL(expected, actual);
 Abort current test if expected != actual. Do NOT use with strings, arrays,
