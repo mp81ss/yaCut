@@ -2,8 +2,6 @@
 
     ADD: YCT_VERSION_RELEASE (now yaCut has a decent versioning system)
     ADD: YCT_ATOMIC
-    ADD: YCT_ASSERT_TRUE[_MSG]
-    ADD: YCT_ASSERT_FALSE[_MSG]
     ADD: YCT_ASSERT_ZERO[_MSG]
     ADD: YCT_ASSERT_ONE[_MSG]
     FIX: Improved cast on variable dumping for windows platform

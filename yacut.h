@@ -620,16 +620,6 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         }                                             \
     } } while (0)
 
-#define YCT_ASSERT_ONE(cond) YCT_ASSERT_EQUAL(1, (cond))
-#define YCT_ASSERT_ONE_MSG(cond, msg) YCT_ASSERT_EQUAL_MSG(1, (cond), msg)
-#define YCT_ASSERT_TRUE(cond) YCT_ASSERT_ONE(cond)
-#define YCT_ASSERT_TRUE_MSG(cond, msg) YCT_ASSERT_ONE_MSG((cond), msg)
-
-#define YCT_ASSERT_ZERO(cond) YCT_ASSERT_EQUAL(0, (cond))
-#define YCT_ASSERT_ZERO_MSG(cond, msg) YCT_ASSERT_EQUAL_MSG(0, (cond), msg)
-#define YCT_ASSERT_FALSE(cond) YCT_ASSERT_ZERO(cond)
-#define YCT_ASSERT_FALSE_MSG(cond, msg) YCT_ASSERT_ZERO_MSG((cond), msg)
-
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     do { VNUT_YCT_IF_OK {                                       \
         p_yct_ctx_->checks++;                                   \
@@ -669,6 +659,11 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
             VNUT_YCT_RETURN();                                  \
         }                                                       \
     } } while (0)
+
+#define YCT_ASSERT_ZERO(cond) YCT_ASSERT_EQUAL(0, (cond))
+#define YCT_ASSERT_ZERO_MSG(cond, msg) YCT_ASSERT_EQUAL_MSG(0, (cond), msg)
+#define YCT_ASSERT_ONE(cond) YCT_ASSERT_EQUAL(1, (cond))
+#define YCT_ASSERT_ONE_MSG(cond, msg) YCT_ASSERT_EQUAL_MSG(1, (cond), msg)
 
 #define YCT_ASSERT_NOT_EQUAL(v1, v2)                     \
     do { VNUT_YCT_IF_OK {                                \

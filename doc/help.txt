@@ -405,12 +405,6 @@ Abort current test if condition doesn't return 0.
 YCT_ASSERT_ONE(condition);
 Abort current test if condition doesn't return 1.
 
-YCT_ASSERT_TRUE(condition);
-See YCT_ASSERT_ONE.
-
-YCT_ASSERT_FALSE(condition);
-See YCT_ASSERT_ZERO.
-
 YCT_ASSERT_EQUAL(expected, actual);
 Abort current test if expected != actual. Do NOT use with strings, arrays,
 objects/structs. Technically this assertion can be used with pointers since they
