@@ -96,6 +96,15 @@ YCT_LAST_FAILED();
 Return non-zero if last test/suite fails, zero otherwise. It is updated at the
 end of every test/suite.
 
+YCT_LAST_WARNED();
+Return non-zero if last warning failed, zero otherwise.
+
+YCT_GET_WARNINGS();
+Returns an integer containing the number of warnings in current context.
+
+YCT_GET_MESSAGES();
+Returns an integer containing the number of messages in current context.
+
 YCT_DUMP_SHORT();
 Print something like "all ok" or "some warning" or "some failure".
 

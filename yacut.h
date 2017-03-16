@@ -85,6 +85,7 @@ extern "C" {
 #define VNUT_YCT_FLAGS_LOG                  0x20
 #define VNUT_YCT_FLAGS_DISABLED_TIMING      0x40
 #define VNUT_YCT_FLAGS_LAST_FAILED          0x80
+#define VNUT_YCT_FLAGS_LAST_WARNED          0x100
 
 #define YCT_GET_NAME()          "yaCut"
 #define YCT_VERSION_MAJOR()     2
@@ -146,6 +147,9 @@ struct yct_context {
 
 #define YCT_LAST_FAILED() VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
                                            VNUT_YCT_FLAGS_LAST_FAILED)
+
+#define YCT_GET_WARNINGS() (p_yct_ctx_->warnings)
+#define YCT_GET_MESSAGES() (p_yct_ctx_->messages)
 
 /* Enable/Disable */
 #define YCT_ENABLE() \
@@ -566,7 +570,8 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
                 p_yct_ctx_->failed = 1;                                     \
                 VNUT_YCT_RETURN();                                          \
             }                                                               \
-        }                                                                   \
+            VNUT_YCT_SET_BIT(p_yct_ctx_, VNUT_YCT_FLAGS_LAST_WARNED);       \
+        } else VNUT_YCT_CLEAR_BIT(p_yct_ctx_, VNUT_YCT_FLAGS_LAST_WARNED);  \
     } } while (0)
 
 #define YCT_WARNING_MSG(cond, msg)                                          \
@@ -583,7 +588,8 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
                 p_yct_ctx_->failed = 1;                                     \
                 VNUT_YCT_RETURN();                                          \
             }                                                               \
-        }                                                                   \
+            VNUT_YCT_SET_BIT(p_yct_ctx_, VNUT_YCT_FLAGS_LAST_WARNED);       \
+        } else VNUT_YCT_CLEAR_BIT(p_yct_ctx_, VNUT_YCT_FLAGS_LAST_WARNED);  \
     } } while (0)
 
 #define YCT_FAIL(msg)                                 \
