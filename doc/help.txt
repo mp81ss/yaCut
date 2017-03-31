@@ -76,8 +76,8 @@ Present in ALL versions of yaCut, use this macro to detect yaCut presence.
 YCT_VERSION_MINOR();
 Returns an integer representing the minor version of the library.
 
-YCT_VERSION_RELEASE();
-Returns an integer representing the release version of the library.
+YCT_VERSION_RELEASE
+An integer representing the release version of the library.
 
 YCT_SET_OUTPUT(handle);
 Set the output handle. The default is stdout. You can pass your FILE* variable.
@@ -95,6 +95,19 @@ and YCT_STATUS_FAILED macros instead of numbers.
 YCT_LAST_FAILED();
 Return non-zero if last test/suite fails, zero otherwise. It is updated at the
 end of every test/suite.
+
+YCT_LAST_WARNED();
+Return non-zero if last warning failed, zero otherwise.
+
+YCT_GET_TOTAL_WARNINGS();
+Returns an integer containing the number of ALL warnings in current context.
+
+YCT_GET_WARNINGS();
+Returns an integer containing the number of TRIGGERED warnings
+in current context.
+
+YCT_GET_MESSAGES();
+Returns an integer containing the number of messages in current context.
 
 YCT_DUMP_SHORT();
 Print something like "all ok" or "some warning" or "some failure".
@@ -288,7 +301,9 @@ See code example ex_block.c
 YCT_DISABLE_TIMING();
 Disable time recording, execution time is not printed by YCT_DUMP macro.
 
+
 -- Extra Features
+
 
 If you compile with YCT_OPT_DISABLE_TIMING, compilation will go ok, but
 YCT_TIMER will be defined as int and your compiler will probably warn about
@@ -386,18 +401,24 @@ YCT_MESSAGE(message);
 Write message on output stream.
 
 YCT_WARNING(condition);
-Issue a warning if condition is false.
+Issue a warning if condition is false (zero).
 
 YCT_FAIL(message);
 Abort current test and writes message.
 
 YCT_ASSERT(condition);
-Abort current test if condition fails.
+Abort current test if condition fails (zero).
 
 YCT_ASSERT_MSG(condition, message);
 Abort current test and write message if condition fails. All assertions below
 have the_MSG version too, like this. Just add _MSG to macro name and add the
-message as last parameter.
+message as last parameter. Must be a string, char* or literal.
+
+YCT_ASSERT_ZERO(condition);
+Abort current test if condition doesn't return 0.
+
+YCT_ASSERT_ONE(condition);
+Abort current test if condition doesn't return 1.
 
 YCT_ASSERT_EQUAL(expected, actual);
 Abort current test if expected != actual. Do NOT use with strings, arrays,

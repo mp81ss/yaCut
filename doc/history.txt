@@ -1,9 +1,15 @@
-2.0.2 (?? MAR 2017)
+2.0.2 (?? APR 2017)
 
-    ADD: YCT_VERSION_RELEASE() (now yaCut has a decent versioning system)
+    ADD: YCT_VERSION_RELEASE (now yaCut has a almost decent versioning system)
+    ADD: YCT_ASSERT_ZERO[_MSG]
+    ADD: YCT_ASSERT_ONE[_MSG]
+    ADD: YCT_LAST_WARNED
+    ADD: YCT_GET_TOTAL_WARNINGS
+    ADD: YCT_GET_WARNINGS
+    ADD: YCT_GET_MESSAGES
     ADD: YCT_ATOMIC
-    ADD: YCT_BARRIER
     FIX: Improved cast on variable dumping for windows platform
+    FIX: Documentation
 
 
 2.0.1 (28 FEB 2017)
