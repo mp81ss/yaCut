@@ -567,9 +567,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         p_yct_ctx_->checks++; p_yct_ctx_->total_warnings++;                  \
         VNUT_YCT_LOG(cond);                                                  \
         if (!(cond)) {                                                       \
+            VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_WARNED); \
             p_yct_ctx_->warnings++;                                          \
             VNUT_YCT_PRINT("WARNING", #cond);                                \
-            VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_WARNED); \
             if (p_yct_ctx_->out != NULL)                                     \
                 VNUT_YCT_FPUTS("\n");                                        \
             if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,                          \
@@ -580,9 +580,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
                 VNUT_YCT_RETURN();                                           \
             }                                                                \
         }                                                                    \
-        else                                                                 \
+        else {                                                               \
             VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                            \
-                               VNUT_YCT_FLAGS_LAST_WARNED);                  \
+                               VNUT_YCT_FLAGS_LAST_WARNED); }                \
     } } while (0)
 
 #define YCT_WARNING_MSG(cond, msg)                                           \
@@ -590,8 +590,8 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
         p_yct_ctx_->checks++; p_yct_ctx_->total_warnings++;                  \
         VNUT_YCT_LOG(cond);                                                  \
         if (!(cond)) {                                                       \
-            p_yct_ctx_->warnings++;                                          \
             VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_WARNED); \
+            p_yct_ctx_->warnings++;                                          \
             VNUT_YCT_PRINT_MSG("WARNING", #cond, msg);                       \
             if (VNUT_YCT_GET_BIT(p_yct_ctx_->flags,                          \
                                  VNUT_YCT_FLAGS_FULL_BLOCKING_MODE) != 0)    \
@@ -601,9 +601,9 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
                 VNUT_YCT_RETURN();                                           \
             }                                                                \
         }                                                                    \
-        else                                                                 \
+        else {                                                               \
             VNUT_YCT_CLEAR_BIT(p_yct_ctx_->flags,                            \
-                               VNUT_YCT_FLAGS_LAST_WARNED);                  \
+                               VNUT_YCT_FLAGS_LAST_WARNED); }                \
     } } while (0)
 
 #define YCT_FAIL(msg)                                 \

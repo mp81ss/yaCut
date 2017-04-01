@@ -100,10 +100,10 @@ YCT_LAST_WARNED();
 Return non-zero if last warning failed, zero otherwise.
 
 YCT_GET_TOTAL_WARNINGS();
-Returns an integer containing the number of ALL warnings in current context.
+Return an integer containing the number of ALL warnings in current context.
 
 YCT_GET_WARNINGS();
-Returns an integer containing the number of TRIGGERED warnings
+Return an integer containing the number of TRIGGERED warnings
 in current context.
 
 YCT_GET_MESSAGES();
