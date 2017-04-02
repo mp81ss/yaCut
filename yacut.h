@@ -102,7 +102,7 @@ struct yct_context {
     int suites;
     int messages;
     int tests;
-    int checks;
+    int assertions;
     int total_warnings;
     int warnings;
     int failed;
@@ -113,7 +113,7 @@ struct yct_context {
     ctx.suites             = 0; \
     ctx.messages           = 0; \
     ctx.tests              = 0; \
-    ctx.checks             = 0; \
+    ctx.assertions         = 0; \
     ctx.total_warnings     = 0; \
     ctx.warnings           = 0; \
     ctx.failed             = 0; \
@@ -246,9 +246,9 @@ struct yct_context {
 #define YCT_TEST(test_name) \
     static void test_name(struct yct_context* const p_yct_ctx_)
 
-#define DISABLE_YCT_TEST(test_name) YCT_TEST(test_name) { \
-    if (p_yct_ctx_->checks == p_yct_ctx_->flags)          \
-        p_yct_ctx_->checks = p_yct_ctx_->flags; return; } \
+#define DISABLE_YCT_TEST(test_name) YCT_TEST(test_name) {     \
+    if (p_yct_ctx_->assertions == p_yct_ctx_->flags)          \
+        p_yct_ctx_->assertions = p_yct_ctx_->flags; return; } \
     void test_name##_YCT_DISABLED_TEST_(struct yct_context* const p_yct_ctx_)
 
 #define YCT_SUITE(suite_name, setup, teardown)                     \
@@ -298,7 +298,7 @@ struct yct_context {
         p_yct_ctx_->tests++;                                                 \
         p_yct_ctx_->total_warnings += yct_ctx_.total_warnings;               \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                           \
-        p_yct_ctx_->checks += yct_ctx_.checks;                               \
+        p_yct_ctx_->assertions += yct_ctx_.assertions;                       \
         p_yct_ctx_->messages += yct_ctx_.messages;                           \
         if (yct_ctx_.failed > 0) {                                           \
             VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,             \
@@ -332,7 +332,7 @@ struct yct_context {
         p_yct_ctx_->tests++;                                                 \
         p_yct_ctx_->total_warnings += yct_ctx_.total_warnings;               \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                           \
-        p_yct_ctx_->checks += yct_ctx_.checks;                               \
+        p_yct_ctx_->assertions += yct_ctx_.assertions;                       \
         p_yct_ctx_->messages += yct_ctx_.messages;                           \
         if (yct_ctx_.failed > 0) {                                           \
             VNUT_YCT_COPY_BIT(yct_ctx_.flags, p_yct_ctx_->flags,             \
@@ -374,7 +374,7 @@ struct yct_context {
         p_yct_ctx_->failed += yct_ctx_.failed;                           \
         p_yct_ctx_->total_warnings += yct_ctx_.total_warnings;           \
         p_yct_ctx_->warnings += yct_ctx_.warnings;                       \
-        p_yct_ctx_->checks += yct_ctx_.checks;                           \
+        p_yct_ctx_->assertions += yct_ctx_.assertions;                   \
         p_yct_ctx_->messages += yct_ctx_.messages;                       \
     } } while (0)
 
@@ -432,7 +432,7 @@ struct yct_context {
     p_yct_ctx_->tests++;                                   \
     p_yct_ctx_->total_warnings += yct_ctx_.total_warnings; \
     p_yct_ctx_->warnings += yct_ctx_.warnings;             \
-    p_yct_ctx_->checks += yct_ctx_.checks;                 \
+    p_yct_ctx_->assertions += yct_ctx_.assertions;         \
     p_yct_ctx_->messages += yct_ctx_.messages;             \
     if (yct_ctx_.failed > 0) {                             \
         VNUT_YCT_COPY_BIT(yct_ctx_.flags,                  \
@@ -471,18 +471,18 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
     p_yct_ctx_->msg != NULL ? "\nExecuting battery: " : "",                  \
     p_yct_ctx_->msg != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_);        \
     VNUT_YCT_FPUTS("\n");                                                    \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Passed:       %d\n",            \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, " passed:      %d\n",            \
     vnut_yct_passed_);                                                       \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Failed:       %d\n",            \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, " failed:      %d\n",            \
     p_yct_ctx_->failed);                                                     \
     (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Suites:       %d\n",            \
     p_yct_ctx_->suites);                                                     \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Assertions:   %d\n",            \
+    p_yct_ctx_->assertions);                                                 \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Warnings:     %d\n",            \
+    p_yct_ctx_->total_warnings);                                             \
     (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Messages:     %d\n",            \
     p_yct_ctx_->messages);                                                   \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Warnings:     %d\n",            \
-    p_yct_ctx_->warnings);                                                   \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Assertions:   %d\n",            \
-    p_yct_ctx_->checks - p_yct_ctx_->total_warnings);                        \
     (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Success:      %d",              \
     (100 * vnut_yct_passed_) / vnut_yct_tests_); VNUT_YCT_FPUTS("%");        \
     VNUT_YCT_PRINT_ELAPSED_TIME();                                           \
@@ -564,7 +564,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_WARNING(cond)                                                    \
     do { VNUT_YCT_IF_OK {                                                    \
-        p_yct_ctx_->checks++; p_yct_ctx_->total_warnings++;                  \
+        p_yct_ctx_->total_warnings++;                                        \
         VNUT_YCT_LOG(cond);                                                  \
         if (!(cond)) {                                                       \
             VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_WARNED); \
@@ -587,7 +587,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_WARNING_MSG(cond, msg)                                           \
     do { VNUT_YCT_IF_OK {                                                    \
-        p_yct_ctx_->checks++; p_yct_ctx_->total_warnings++;                  \
+        p_yct_ctx_->total_warnings++;                                        \
         VNUT_YCT_LOG(cond);                                                  \
         if (!(cond)) {                                                       \
             VNUT_YCT_SET_BIT(p_yct_ctx_->flags, VNUT_YCT_FLAGS_LAST_WARNED); \
@@ -616,7 +616,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT(cond)                     \
     do { VNUT_YCT_IF_OK {                    \
-        p_yct_ctx_->checks++;                \
+        p_yct_ctx_->assertions++;            \
         VNUT_YCT_LOG(cond);                  \
         if (!(cond)) {                       \
             VNUT_YCT_PRINT("FAILED", #cond); \
@@ -630,7 +630,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_MSG(cond, msg)                     \
     do { VNUT_YCT_IF_OK {                             \
-        p_yct_ctx_->checks++;                         \
+        p_yct_ctx_->assertions++;                     \
         VNUT_YCT_LOG(cond);                           \
         if (!(cond)) {                                \
             VNUT_YCT_PRINT_MSG("FAILED", #cond, msg); \
@@ -642,7 +642,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL(expected, actual)                      \
     do { VNUT_YCT_IF_OK {                                       \
-        p_yct_ctx_->checks++;                                   \
+        p_yct_ctx_->assertions++;                               \
         VNUT_YCT_LOG(expected == actual);                       \
         if (!((expected) == (actual))) {                        \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
@@ -661,7 +661,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL_MSG(expected, actual, msg)             \
     do { VNUT_YCT_IF_OK {                                       \
-        p_yct_ctx_->checks++;                                   \
+        p_yct_ctx_->assertions++;                               \
         VNUT_YCT_LOG(expected == actual);                       \
         if (!((expected) == (actual))) {                        \
             VNUT_YCT_PRINT("FAILED", #expected " == " #actual); \
@@ -687,7 +687,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL(v1, v2)                     \
     do { VNUT_YCT_IF_OK {                                \
-        p_yct_ctx_->checks++;                            \
+        p_yct_ctx_->assertions++;                        \
         VNUT_YCT_LOG(v1 != v2);                          \
         if ((v1) == (v2)) {                              \
             VNUT_YCT_PRINT("FAILED", #v1 " != " #v2);    \
@@ -704,7 +704,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL_MSG(v1, v2, msg)            \
     do { VNUT_YCT_IF_OK {                                \
-        p_yct_ctx_->checks++;                            \
+        p_yct_ctx_->assertions++;                        \
         VNUT_YCT_LOG(v1 != v2);                          \
         if ((v1) == (v2)) {                              \
             VNUT_YCT_PRINT("FAILED", #v1 " != " #v2);    \
@@ -723,7 +723,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NULL(var)                   \
     do { VNUT_YCT_IF_OK {                      \
-        p_yct_ctx_->checks++;                  \
+        p_yct_ctx_->assertions++;              \
         VNUT_YCT_LOG(var == NULL);             \
         if ((var) != NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
@@ -740,7 +740,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NULL_MSG(var, msg)             \
     do { VNUT_YCT_IF_OK {                         \
-        p_yct_ctx_->checks++;                     \
+        p_yct_ctx_->assertions++;                 \
         VNUT_YCT_LOG(var == NULL);                \
         if ((var) != NULL) {                      \
             VNUT_YCT_PRINT_MAIN("FAILED");        \
@@ -759,7 +759,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_NULL(var)               \
     do { VNUT_YCT_IF_OK {                      \
-        p_yct_ctx_->checks++;                  \
+        p_yct_ctx_->assertions++;              \
         VNUT_YCT_LOG(var != NULL);             \
         if ((var) == NULL) {                   \
             VNUT_YCT_PRINT_MAIN("FAILED");     \
@@ -776,7 +776,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_NULL_MSG(var, msg)   \
     do { VNUT_YCT_IF_OK {                   \
-        p_yct_ctx_->checks++;               \
+        p_yct_ctx_->assertions++;           \
         VNUT_YCT_LOG(var != NULL);          \
         if ((var) == NULL) {                \
             VNUT_YCT_PRINT_MAIN("FAILED");  \
@@ -811,7 +811,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_EQUAL_STR(expected, actual)                  \
     do { VNUT_YCT_IF_OK {                                       \
     int vnut_yct_out_;                                          \
-    p_yct_ctx_->checks++;                                       \
+    p_yct_ctx_->assertions++;                                   \
     VNUT_YCT_LOG(expected == actual);                           \
     VNUT_YCT_COMPARE_STR((expected), (actual), vnut_yct_out_);  \
     if (vnut_yct_out_ != 0) {                                   \
@@ -832,7 +832,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_EQUAL_STR_MSG(expected, actual, msg)            \
     do { VNUT_YCT_IF_OK {                                          \
         int vnut_yct_out_;                                         \
-        p_yct_ctx_->checks++;                                      \
+        p_yct_ctx_->assertions++;                                  \
         VNUT_YCT_LOG(expected == actual);                          \
         VNUT_YCT_COMPARE_STR((expected), (actual), vnut_yct_out_); \
         if (vnut_yct_out_ != 0) {                                  \
@@ -855,7 +855,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_NOT_EQUAL_STR(str1, str2)                 \
     do { VNUT_YCT_IF_OK {                                    \
         int vnut_yct_out_;                                   \
-        p_yct_ctx_->checks++;                                \
+        p_yct_ctx_->assertions++;                            \
         VNUT_YCT_LOG(str1 != str2);                          \
         VNUT_YCT_COMPARE_STR((str1), (str2), vnut_yct_out_); \
         if (vnut_yct_out_ == 0) {                            \
@@ -874,7 +874,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_NOT_EQUAL_STR_MSG(str1, str2, msg)        \
     do { VNUT_YCT_IF_OK {                                    \
         int vnut_yct_out_;                                   \
-        p_yct_ctx_->checks++;                                \
+        p_yct_ctx_->assertions++;                            \
         VNUT_YCT_LOG(str1 != str2);                          \
         VNUT_YCT_COMPARE_STR((str1), (str2), vnut_yct_out_); \
         if (vnut_yct_out_ == 0) {                            \
@@ -898,7 +898,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_EQUAL_ARRAY(expected, actual, len)                       \
     do { VNUT_YCT_IF_OK {                                                   \
         unsigned int vnut_yct_out_;                                         \
-        p_yct_ctx_->checks++;                                               \
+        p_yct_ctx_->assertions++;                                           \
         VNUT_YCT_LOG(expected == actual);                                   \
         VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), vnut_yct_out_); \
         if (vnut_yct_out_ < (unsigned int)(len)) {                          \
@@ -916,7 +916,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_EQUAL_ARRAY_MSG(expected, actual, len, msg)               \
     do { VNUT_YCT_IF_OK {                                                    \
         unsigned int vnut_yct_out_;                                          \
-        p_yct_ctx_->checks++;                                                \
+        p_yct_ctx_->assertions++;                                            \
         VNUT_YCT_LOG(expected == actual);                                    \
         VNUT_YCT_COMPARE_ARRAY((expected), (actual), (len), vnut_yct_out_);  \
         if (vnut_yct_out_ < (unsigned int)(len)) {                           \
@@ -936,7 +936,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_NOT_EQUAL_ARRAY(arr1, arr2, len)                   \
     do { VNUT_YCT_IF_OK {                                             \
         unsigned int vnut_yct_out_;                                   \
-        p_yct_ctx_->checks++;                                         \
+        p_yct_ctx_->assertions++;                                     \
         VNUT_YCT_LOG(arr1 != arr2);                                   \
         VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), vnut_yct_out_); \
         if (vnut_yct_out_ == (unsigned int)(len)) {                   \
@@ -952,7 +952,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 #define YCT_ASSERT_NOT_EQUAL_ARRAY_MSG(arr1, arr2, len, msg)          \
     do { VNUT_YCT_IF_OK {                                             \
         unsigned int vnut_yct_out_;                                   \
-        p_yct_ctx_->checks++;                                         \
+        p_yct_ctx_->assertions++;                                     \
         VNUT_YCT_LOG(arr1 != arr2);                                   \
         VNUT_YCT_COMPARE_ARRAY((arr1), (arr2), (len), vnut_yct_out_); \
         if (vnut_yct_out_ == (unsigned int)(len)) {                   \
@@ -965,7 +965,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL_OBJ(expected, actual, fcmp) \
     do { VNUT_YCT_IF_OK {                            \
-        p_yct_ctx_->checks++;                        \
+        p_yct_ctx_->assertions++;                    \
         VNUT_YCT_LOG(expected == actual);            \
         if (fcmp(&expected, &actual) != 0) {         \
             VNUT_YCT_PRINT_MAIN("FAILED");           \
@@ -984,7 +984,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL_OBJ_MSG(expected, actual, fcmp, msg) \
     do { VNUT_YCT_IF_OK {                                     \
-        p_yct_ctx_->checks++;                                 \
+        p_yct_ctx_->assertions++;                             \
         VNUT_YCT_LOG(expected == actual);                     \
         if (fcmp(&expected, &actual) != 0) {                  \
             VNUT_YCT_PRINT_MAIN("FAILED");                    \
@@ -1005,7 +1005,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL_OBJ(obj1, obj2, fcmp) \
     do { VNUT_YCT_IF_OK {                          \
-        p_yct_ctx_->checks++;                      \
+        p_yct_ctx_->assertions++;                  \
         VNUT_YCT_LOG(obj1 != obj2);                \
         if (fcmp(&obj1, &obj2) == 0) {             \
             VNUT_YCT_PRINT_MAIN("FAILED");         \
@@ -1024,7 +1024,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL_OBJ_MSG(obj1, obj2, fcmp, msg) \
     do { VNUT_YCT_IF_OK {                                   \
-        p_yct_ctx_->checks++;                               \
+        p_yct_ctx_->assertions++;                           \
         VNUT_YCT_LOG(obj1 != obj2);                         \
         if (fcmp(&obj1, &obj2) == 0) {                      \
             VNUT_YCT_PRINT_MAIN("FAILED");                  \
@@ -1045,7 +1045,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL_FLOAT(expected_float, actual_float, tolerance)     \
     do { VNUT_YCT_IF_OK {                                                   \
-        p_yct_ctx_->checks++;                                               \
+        p_yct_ctx_->assertions++;                                           \
         VNUT_YCT_LOG(expected_float == actual_float);                       \
         if (VNUT_YCT_ABS((expected_float) - (actual_float)) > tolerance) {  \
             VNUT_YCT_PRINT("FAILED", #expected_float " == " #actual_float); \
@@ -1059,7 +1059,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_EQUAL_FLOAT_MSG(exp_float, act_float, tol, msg)           \
     do { VNUT_YCT_IF_OK {                                                    \
-        p_yct_ctx_->checks++;                                                \
+        p_yct_ctx_->assertions++;                                            \
         VNUT_YCT_LOG(exp_float == act_float);                                \
         if (VNUT_YCT_ABS((exp_float) - (act_float)) > tol) {                 \
             VNUT_YCT_PRINT_MSG("FAILED", #exp_float " == " #act_float, msg); \
@@ -1071,7 +1071,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL_FLOAT(a, b, t)           \
     do { VNUT_YCT_IF_OK {                             \
-        p_yct_ctx_->checks++;                         \
+        p_yct_ctx_->assertions++;                     \
         VNUT_YCT_LOG(a != b);                         \
         if (VNUT_YCT_ABS((a) - (b)) > t) { ; } else { \
             VNUT_YCT_PRINT("FAILED", #a " != " #b);   \
@@ -1085,7 +1085,7 @@ for (vnut_yct_i_ = vnut_yct_nibbles_ - 1; vnut_yct_i_ >= 0; vnut_yct_i_--) { \
 
 #define YCT_ASSERT_NOT_EQUAL_FLOAT_MSG(a, b, t, msg)         \
     do { VNUT_YCT_IF_OK {                                    \
-        p_yct_ctx_->checks++;                                \
+        p_yct_ctx_->assertions++;                            \
         VNUT_YCT_LOG(a != b);                                \
         if (VNUT_YCT_ABS((a) - (b)) > t) { ; } else {        \
             VNUT_YCT_PRINT_MSG("FAILED", #a " != " #b, msg); \
