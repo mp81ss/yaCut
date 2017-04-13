@@ -471,9 +471,9 @@ do { if (p_yct_ctx_->out != NULL) {                                          \
     p_yct_ctx_->msg != NULL ? "\nExecuting battery: " : "",                  \
     p_yct_ctx_->msg != NULL ? p_yct_ctx_->msg : "", vnut_yct_tests_);        \
     VNUT_YCT_FPUTS("\n");                                                    \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, " passed:      %d\n",            \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Passed:       %d\n",            \
     vnut_yct_passed_);                                                       \
-    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, " failed:      %d\n",            \
+    (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Failed:       %d\n",            \
     p_yct_ctx_->failed);                                                     \
     (void)VNUT_YCT_FPRINTF(p_yct_ctx_->out, "Suites:       %d\n",            \
     p_yct_ctx_->suites);                                                     \
