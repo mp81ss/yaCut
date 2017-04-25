@@ -136,15 +136,15 @@ struct yct_context {
 #define YCT_STATUS_WARNING 1
 #define YCT_STATUS_FAILED  2
 
-#define YCT_GET_RETURN_VALUE(val) do {          \
-    if (p_yct_ctx_->failed > 0)                 \
-        val = YCT_STATUS_FAILED;                \
-    else {                                      \
-        if (p_yct_ctx_->warnings > 0)           \
-            val = YCT_STATUS_WARNING;           \
-        else                                    \
-            val = YCT_STATUS_OK;                \
-    }                                           \
+#define YCT_GET_RETURN_VALUE(val) do { \
+    if (p_yct_ctx_->failed > 0)        \
+        val = YCT_STATUS_FAILED;       \
+    else {                             \
+        if (p_yct_ctx_->warnings > 0)  \
+            val = YCT_STATUS_WARNING;  \
+        else                           \
+            val = YCT_STATUS_OK;       \
+    }                                  \
 } while (0)
 
 #define YCT_LAST_FAILED() VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
@@ -397,7 +397,6 @@ struct yct_context {
 #define YCT_GO()
 #define YCT_SYNCHRONIZED()
 #define YCT_ATOMIC()
-#define YCT_BARRIER()
 
 #else
 #pragma message("yaCut: PARALLEL ENABLED")
