@@ -1,4 +1,4 @@
-                                YACUT v2.0 manual
+                              yaCut v2.0.2 manual
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C header, just include it and compile.
@@ -12,6 +12,8 @@ Next section describes the macro you can define BEFORE including yaCut.
 You can ignore them unless you have compilation errors. Disabling some feature
 is useful to reduce executable size (see faq).
 Then follows a list of all available macros (excluding the *_MSG version).
+WARNING: It is highly recommended to avoid side effects while calling ALL yaCut
+macros ( ex.: YCT_ASSERT_EQUAL(0, x++) )
 
 
 -----------------------------------------------------------------------------
@@ -479,3 +481,4 @@ Happy testing!
 
 P.S.:
 This is dedicated to Paperotta
+
