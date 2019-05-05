@@ -1,3 +1,10 @@
+2.0.3 (05 MAY 2019)
+
+    ADD: YCT_OPT_SILENT option
+    ADD: YCT_GET_STATUS
+    FIX: Documentation
+
+
 2.0.2 (25 MAR 2017)
 
     ADD: YCT_VERSION_RELEASE (now yaCut has an almost decent versioning system)

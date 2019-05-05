@@ -53,6 +53,7 @@ YCT_SUITE_END
 
 int main(void)
 {
+    struct yct_context* ctx;
     int status;
 
     YCT_BEGIN("xUnit");
@@ -70,6 +71,9 @@ int main(void)
     YCT_DUMP(); /* extended dump will be written to stderr. */
 
     YCT_GET_RETURN_VALUE(status); /* 0 if OK, 1 on warnings, 2 on failed. */
+
+    ctx = YCT_GET_STATUS();
+    printf("Total/success = %d/%d\n", ctx->tests, ctx->tests - ctx->failed);
 
     YCT_END();
 

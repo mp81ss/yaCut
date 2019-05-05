@@ -1,4 +1,4 @@
-                              yaCut v2.0.2 manual
+                              yaCut v2.0.3 manual
 
 This file describes the usage of the yacut C testing framework.
 It is just a single C header, just include it and compile.
@@ -53,6 +53,13 @@ YCT_OPT_FWPRINTF
 yaCut normally uses fwprintf for unicode output. You can define this macro to
 instruct yaCut to use your own function (that must have the same prototype).
 
+YCT_OPT_SILENT
+This option force yaCut to avoid any printing. Even usint YCT_SET_OUTPUT
+in your code will have no effect. This will decrease the size of your exe, but
+unused-varible warning will appear on _MSG assertions.
+Note that this option is incompatible with YCT_OPT_FWPRINTF/YCT_OPT_FPRINTF
+and YCT_OPT_JAILHOUSE options.
+
 YCT_FUNC_NAME
 This is not a real parameter. This is the macro (if defined so) that the
 compilers offer to retrieve the current function name. It is needed by yaCut,
@@ -93,6 +100,12 @@ Give a status number according to current context.
 The integer variable status will be 0 if all ok, 1 if some warning, or 2 on
 assertions failure. It is recommended to use YCT_STATUS_OK, YCT_STATUS_WARNING
 and YCT_STATUS_FAILED macros instead of numbers.
+
+YCT_GET_STATUS();
+Return the current context. Assign the result of this macro to a variable of
+type struct yct_context*. From context you can have access to all available info
+about current status. See that structure in yacut.h file, or see example in
+file ex_suite.c
 
 YCT_LAST_FAILED();
 Return non-zero if last test/suite fails, zero otherwise. It is updated at the
@@ -448,11 +461,11 @@ as arguments.
 
 YCT_ASSERT_EQUAL_ARRAY(expected_array1, expected_array2, len);
 Abort current test if arrays expected_array1 and expected_array2 have at least
-a different element in range [0, len].
+a different element in range [0..len).
 
 YCT_ASSERT_NOT_EQUAL_ARRAY(array1, array2, len);
-Abort current test if arrays array1 and array2 have all elements equal in range
-[0, len].
+Abort current test if arrays array1 and array2 have all elements equal
+in range [0..len).
 
 YCT_ASSERT_EQUAL_OBJ(expected_obj, actual_obj, fcmp);
 Abort current test if expected_obj and actual_obj are different. fcmp is the

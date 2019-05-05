@@ -1,6 +1,6 @@
 /*
- *  yaCut v2.0.2 - Yet Another C Unit Test
- *  Copyright (c) 2017 - Michele Pes
+ *  yaCut v2.0.3 - Yet Another C Unit Test
+ *  Copyright (c) 2019 - Michele Pes
  *
  *  Distributed under the BSD License
  *  See accompanying file LICENSE.txt or copy at
@@ -23,6 +23,15 @@ extern "C" {
 #define YCT_TIMER clock_t
 #else
 #define YCT_TIMER int
+#endif
+
+#ifdef YCT_OPT_SILENT
+#if ((defined(YCT_OPT_FPRINTF)) || (defined(YCT_OPT_FWPRINTF)) \
+    || (defined(YCT_OPT_JAILHOUSE)))
+#error "YCT_OPT_SILENT option is incompatible here"
+#endif
+#define YCT_OPT_FPRINTF(...)  (p_yct_ctx_)
+#define YCT_OPT_FWPRINTF(...) (p_yct_ctx_)
 #endif
 
 #ifdef YCT_OPT_FPRINTF
@@ -90,7 +99,7 @@ extern "C" {
 #define YCT_GET_NAME()          "yaCut"
 #define YCT_VERSION_MAJOR()     2
 #define YCT_VERSION_MINOR()     0
-#define YCT_VERSION_RELEASE     2
+#define YCT_VERSION_RELEASE     3
 
 struct yct_context {
     void* arg;
@@ -109,15 +118,18 @@ struct yct_context {
     int flags;
 };
 
-#define VNUT_YCT_INIT_DATA(ctx) \
-    ctx.suites             = 0; \
-    ctx.messages           = 0; \
-    ctx.tests              = 0; \
-    ctx.assertions         = 0; \
-    ctx.total_warnings     = 0; \
-    ctx.warnings           = 0; \
-    ctx.failed             = 0; \
-    ctx.flags              = 0
+static void vnut_yct_init_data(struct yct_context* const p) {
+    p->suites         = 0;
+    p->messages       = 0;
+    p->tests          = 0;
+    p->assertions     = 0;
+    p->total_warnings = 0;
+    p->warnings       = 0;
+    p->failed         = 0;
+    p->flags          = 0;
+}
+
+#define VNUT_YCT_INIT_DATA(ctx) vnut_yct_init_data(&(ctx))
 
 #define VNUT_YCT_GET_BIT(var, mask) ((var) & (mask))
 #define VNUT_YCT_CLEAR_BIT(var, mask) ((var) &= ~(mask))
@@ -128,9 +140,13 @@ struct yct_context {
 
 #define VNUT_YCT_ABS(a) ((a) < (-(a)) ? -(a) : (a))
 
+#ifdef YCT_OPT_SILENT
+#define YCT_DEFAULT_OUTPUT NULL
+#define YCT_SET_OUTPUT(handle)
+#else
 #define YCT_DEFAULT_OUTPUT (stdout)
-
 #define YCT_SET_OUTPUT(handle) (yct_main_ctx_.out = (handle))
+#endif
 
 #define YCT_STATUS_OK      0
 #define YCT_STATUS_WARNING 1
@@ -147,6 +163,8 @@ struct yct_context {
     }                                  \
 } while (0)
 
+#define YCT_GET_STATUS() p_yct_ctx_
+ 
 #define YCT_LAST_FAILED() VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
                                            VNUT_YCT_FLAGS_LAST_FAILED)
 
@@ -238,7 +256,7 @@ struct yct_context {
     struct yct_context yct_main_ctx_;                      \
     struct yct_context* const p_yct_ctx_ = &yct_main_ctx_; \
     VNUT_YCT_INIT_DATA(yct_main_ctx_);                     \
-    YCT_SET_OUTPUT(YCT_DEFAULT_OUTPUT);                    \
+    yct_main_ctx_.out = YCT_DEFAULT_OUTPUT;                \
     yct_main_ctx_.arg = NULL;                              \
     yct_main_ctx_.msg = (const char*)(name);               \
     VNUT_YCT_GET_START_TIME();

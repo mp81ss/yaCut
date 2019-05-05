@@ -1,6 +1,6 @@
-/* Check execution time the serial version and the parallel if you have
-   at least 2 CPUs. Compile the parallel enabling -DYCT_OPT_ENABLE_PARALLEL
-   and /openmp
+/* Check execution time of the serial version and the parallel version
+   if you have at least 2 CPUs. Enable the parallel support at compile-time by
+   setting -DYCT_OPT_ENABLE_PARALLEL and /openmp
 */
 #include <yacut.h>
 
