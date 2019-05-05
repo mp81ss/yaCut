@@ -29,6 +29,7 @@ extern "C" {
 #if ((defined(YCT_OPT_FPRINTF)) || (defined(YCT_OPT_FWPRINTF)) \
     || (defined(YCT_OPT_JAILHOUSE)))
 #error "YCT_OPT_SILENT option is incompatible here"
+#pragma message("yaCut: SILENT mode")
 #endif
 #define YCT_OPT_FPRINTF(...)  (p_yct_ctx_)
 #define YCT_OPT_FWPRINTF(...) (p_yct_ctx_)
