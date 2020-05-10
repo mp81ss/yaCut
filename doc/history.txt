@@ -1,5 +1,6 @@
-2.0.3 (05 MAY 2019)
+2.0.3 (10 MAY 2020)
 
+    ADD: YCT_OPT_EMBEDDED option
     ADD: YCT_OPT_SILENT option
     ADD: YCT_GET_STATUS
     FIX: Documentation

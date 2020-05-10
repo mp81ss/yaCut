@@ -69,6 +69,13 @@ with the value your compiler assign to the current function name.
 Ex.: #define YCT_FUNC_NAME __MY_COMPILER_FUNC_NAME__
 The worst case is to define it to a constant ("unknown") to allow compilation.
 
+YCT_OPT_EMBEDDED
+Just define the following options:
+YCT_OPT_SILENT
+YCT_OPT_DISABLE_TIMING
+YCT_OPT_DISABLE_WCHAR
+YCT_OPT_DISABLE_LOG
+
 
 -----------------------------------------------------------------------------
 

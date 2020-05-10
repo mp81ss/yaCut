@@ -18,6 +18,13 @@ extern "C" {
 #include <stdio.h>
 #endif
 
+#ifdef YCT_OPT_EMBEDDED
+#define YCT_OPT_SILENT
+#define YCT_OPT_DISABLE_TIMING
+#define YCT_OPT_DISABLE_WCHAR
+#define YCT_OPT_DISABLE_LOG
+#endif
+
 #ifndef YCT_OPT_DISABLE_TIMING
 #include <time.h>
 #define YCT_TIMER clock_t
@@ -29,8 +36,8 @@ extern "C" {
 #if ((defined(YCT_OPT_FPRINTF)) || (defined(YCT_OPT_FWPRINTF)) \
     || (defined(YCT_OPT_JAILHOUSE)))
 #error "YCT_OPT_SILENT option is incompatible here"
-#pragma message("yaCut: SILENT mode")
 #endif
+#pragma message("yaCut: SILENT mode")
 #define YCT_OPT_FPRINTF(...)  (p_yct_ctx_)
 #define YCT_OPT_FWPRINTF(...) (p_yct_ctx_)
 #endif
@@ -165,7 +172,7 @@ static void vnut_yct_init_data(struct yct_context* const p) {
 } while (0)
 
 #define YCT_GET_STATUS() p_yct_ctx_
- 
+
 #define YCT_LAST_FAILED() VNUT_YCT_GET_BIT(p_yct_ctx_->flags, \
                                            VNUT_YCT_FLAGS_LAST_FAILED)
 
